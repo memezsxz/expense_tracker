@@ -1,20 +1,22 @@
 from typing import get_args
 
 import streamlit as st
-from iso4217 import Currency
 
 from app.data.colors import BadgeColor, color_emojis
 from app.data.icons import icon_options
-from app.data.models import BankAccount, Category
-from app.data.streamlit_state_keys import ACCOUNT_SELECTED_ACCOUNT, CATEGORY_SELECTED_CATEGORY
+from app.data.models import Category
+from app.data.streamlit_state_keys import CATEGORY_SELECTED_CATEGORY
+from app.db.database import db
 
 
 def update_category(field: str, widget_key: str):
     current = st.session_state[CATEGORY_SELECTED_CATEGORY]
-
-    st.session_state[CATEGORY_SELECTED_CATEGORY] = current.model_copy(
+    copy = current.model_copy(
         update={field: st.session_state[widget_key]}
     )
+
+    st.session_state[CATEGORY_SELECTED_CATEGORY] = copy
+    db.save(copy, op="edit")
 
 
 def details_grid(category: Category):
@@ -26,7 +28,7 @@ def details_grid(category: Category):
         key = f"name_{category.id}"
 
         grid.text_input(
-            label="",
+            label="Name",
             label_visibility="collapsed",
             value=category.name,
             key=key,
@@ -48,7 +50,7 @@ def details_grid(category: Category):
             color_options = get_args(BadgeColor)
 
             st.selectbox(
-                "Color",
+                label="Color",
                 options=color_options,
                 format_func=lambda c: f"{color_emojis[c]} {c.capitalize()}",
                 label_visibility="collapsed",
@@ -79,7 +81,6 @@ def details_grid(category: Category):
                 on_change=update_category,
                 args=("icon", key),
             )
-
 
     name_in()
     color_in()
