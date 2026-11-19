@@ -1,15 +1,59 @@
 import streamlit as st
+from iso4217 import Currency
 
-from app.data.mock_data import bank_accounts
+from app.data.models import BankAccount
 from app.data.page_paths import PAGE_PATH
-from app.data.streamlit_state_keys import ACCOUNTS_ERROR, ACCOUNT_SELECTED_ACCOUNT
+from app.data.streamlit_state_keys import ACCOUNT_SELECTED_ACCOUNT, ACCOUNTS_ALERT_ICON, ACCOUNTS_ALERT_MSG
+from app.db.database import db
 
-# TODO: add retrival
-accounts = bank_accounts
 
-st.title('Manage Accounts')
+def view_account(to_account: BankAccount):
+    st.session_state[ACCOUNT_SELECTED_ACCOUNT] = to_account
+    st.switch_page(st.Page(PAGE_PATH.ACCOUNT))
+
+
+def add_account_btn():
+    new_account = BankAccount(
+        name="Default",
+        balance=0,
+        color="yellow",
+        icon=":material/savings:",
+        currency=Currency.BHD,
+    )
+
+    db.save(new_account, op="add")
+
+    view_account(new_account)
+
+
+bank_accounts: list[BankAccount] = [
+    BankAccount.model_validate(row)
+    for row in db.BankAccount.to_dict(orient="records")
+]
+
+# TODO: add paging
+
+with st.container(
+        horizontal=True,
+        horizontal_alignment="distribute",
+        vertical_alignment="center",
+        gap="small",
+):
+    st.title("Manage Accounts")
+
+    st.button(
+        "Add New Account",
+        type="secondary",
+        icon=":material/add:",
+        on_click=add_account_btn
+    )
 
 st.space(size="small")
+
+if len(bank_accounts) == 0:
+    with st.container(vertical_alignment="center"):
+        st.space(size="large")
+        st.markdown(":gray[You have no accounts, create some!]", text_alignment="center")
 
 for account in bank_accounts:
     acc_con = st.container(border=True)
@@ -29,11 +73,17 @@ for account in bank_accounts:
             st.write(f"{account.balance}{account.currency.code}")
 
         with col4:
-            if st.button("", type="tertiary", icon=":material/manage_search:"):
-                st.session_state[ACCOUNT_SELECTED_ACCOUNT] = account
-                st.switch_page(st.Page(PAGE_PATH.ACCOUNT))
+            st.button("",
+                      type="tertiary",
+                      icon=":material/manage_search:",
+                      key=f"view_btn_{account.id}",
+                      on_click=view_account,
+                      args=(account,),
+                      )
 
-error_msg = st.session_state.get(ACCOUNTS_ERROR)
-if error_msg:
-    st.toast(f":red[{error_msg}]", icon="🚨")
-    st.session_state[ACCOUNTS_ERROR] = None
+alert_msg = st.session_state.get(ACCOUNTS_ALERT_MSG)
+alert_icon = st.session_state.get(ACCOUNTS_ALERT_ICON)
+if alert_msg:
+    st.toast(alert_msg, icon=alert_icon)
+    st.session_state[ACCOUNTS_ALERT_MSG] = None
+    st.session_state[ACCOUNTS_ALERT_ICON] = None

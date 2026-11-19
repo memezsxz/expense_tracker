@@ -8,7 +8,20 @@ from app.data.streamlit_state_keys import ACCOUNTS_ERROR, ACCOUNT_SELECTED_ACCOU
 # TODO: add retrival
 categories = mock_categories
 
-st.title('Manage Categories')
+with st.container(
+        horizontal=True,
+        horizontal_alignment="distribute",
+        vertical_alignment="center",
+        gap="small",
+):
+    st.title("Manage Categories")
+
+    st.button(
+        "Add New Category",
+        type="secondary",
+        icon=":material/add:",
+    )
+    # TODO: add add
 
 st.space(size="small")
 
