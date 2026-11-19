@@ -1,5 +1,5 @@
 from typing import get_args
-
+from app.db.database import db
 import streamlit as st
 from iso4217 import Currency
 
@@ -12,9 +12,14 @@ from app.data.streamlit_state_keys import ACCOUNT_SELECTED_ACCOUNT
 def update_account(field: str, widget_key: str):
     current = st.session_state[ACCOUNT_SELECTED_ACCOUNT]
 
-    st.session_state[ACCOUNT_SELECTED_ACCOUNT] = current.model_copy(
+    copy = current.model_copy(
         update={field: st.session_state[widget_key]}
     )
+
+    st.session_state[ACCOUNT_SELECTED_ACCOUNT] = copy
+    db.save(copy , op="edit")
+    
+
 
 
 def details_grid(account: BankAccount):
