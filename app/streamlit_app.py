@@ -1,20 +1,24 @@
-from pathlib import Path
 import streamlit as st
+
+from app.data.page_paths import PAGE_PATH
 
 pages = {
     "": [
         st.Page(
-            Path("pages/home.py"),
+            PAGE_PATH.HOME,
             title="Home",
             # icon="🔥",
             # help="test",
         ),
-        st.Page(Path("pages/stats.py"), title="Stats")
+        st.Page(PAGE_PATH.STATS, title="Stats")
     ],
     "Settings": [
-        st.Page(Path("pages/categories.py"), title="Manage Categories"),
-        st.Page(Path("pages/accounts.py"), title="Manage Accounts"),
+        st.Page(PAGE_PATH.MANAGE_CATEGORIES, title="Manage Categories"),
+        st.Page(PAGE_PATH.MANAGE_ACCOUNTS, title="Manage Accounts", default=True),
+        st.Page(PAGE_PATH.ACCOUNT, visibility="hidden"),
+        st.Page(PAGE_PATH.CATEGORY, visibility="hidden")
     ],
+
 }
 
 pg = st.navigation(pages)

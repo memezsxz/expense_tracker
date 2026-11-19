@@ -1,15 +1,17 @@
 import datetime as dt
 from enum import Enum
 from typing import Annotated
+from typing import Literal
 from uuid import UUID, uuid4
 
+from iso4217 import Currency
 from pydantic import BaseModel, Field, StringConstraints
 
-
-class Color(str, Enum):
-    RED = "red"
-    GREEN = "green"
-    BLUE = "blue"
+BadgeColor = Literal[
+    "red", "orange", "yellow",
+    "blue", "green", "violet",
+    "gray", "grey", "primary"
+]
 
 
 class TransactionType(str, Enum):
@@ -25,11 +27,6 @@ class TransactionType(str, Enum):
 # allow deleting an account
 # don't allow duplicate account names
 
-HexColor = Annotated[
-    str,
-    Field(pattern=r"^#[0-9a-fA-F]{6}$")
-]
-
 NonEmptyId = Annotated[
     str,
     StringConstraints(strip_whitespace=True, min_length=36)
@@ -43,8 +40,9 @@ class BankAccount(BaseModel):
     id: UUID = Field(default_factory=uuid4)
     name: str = Field(min_length=3)
     balance: int = Field(ge=0, default=0)
-    color: HexColor
+    color: BadgeColor = Field(default="blue")
     icon: str = Field()
+    currency: Currency = Field(default=Currency.BHD)
 
 
 # add edit and view delete
@@ -53,7 +51,7 @@ class BankAccount(BaseModel):
 class Category(BaseModel):
     id: UUID = Field(default_factory=uuid4)
     name: str = Field(min_length=3)
-    color: HexColor
+    color: BadgeColor = Field(default="blue")
     icon: str = Field()
 
 
