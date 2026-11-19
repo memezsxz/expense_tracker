@@ -49,7 +49,7 @@ st.space(size="small")
 if len(categories) == 0:
     with st.container(vertical_alignment="center"):
         st.space(size="large")
-        st.markdown(":gray[You have no accounts, create some!]", text_alignment="center")
+        st.markdown(":gray[You have no categories, create some!]", text_alignment="center")
 
 for category in categories:
     cat_con = st.container(border=True)

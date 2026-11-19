@@ -1,11 +1,12 @@
 import os
 from pathlib import Path
 from typing import Literal
+from uuid import UUID
 
 import pandas as pd
 from pydantic import BaseModel
 
-from app.data.models import BankAccount, Category, Transaction, Attachment
+from app.data.models import BankAccount, Category, Transaction, Attachment, TransactionView
 
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
 DATA_DIR = PROJECT_ROOT / "data"
@@ -19,11 +20,12 @@ OPERATION = Literal[
 ]
 
 TABLES = {
-    BankAccount: "BankAccount",
+    BankAccount: "BankAccounts",
     Category: "Categories",
     Transaction: "Transactions",
     Attachment: "Attachments",
 }
+
 
 class Database:
     _categories_path = DATA_DIR / "categories.csv"
@@ -32,7 +34,7 @@ class Database:
     _attachments_path = DATA_DIR / "attachments.csv"
 
     def __init__(self):
-        self.BankAccount: pd.DataFrame = self._load_data(self._bank_accounts_path)
+        self.BankAccounts: pd.DataFrame = self._load_data(self._bank_accounts_path)
         self.Categories: pd.DataFrame = self._load_data(self._categories_path)
         self.Transactions: pd.DataFrame = self._load_data(self._transactions_path)
         self.Attachments: pd.DataFrame = self._load_data(self._attachments_path)
@@ -44,7 +46,7 @@ class Database:
                 )
 
     def _save_df(self, df: pd.DataFrame):
-        if df is self.BankAccount:
+        if df is self.BankAccounts:
             path = self._bank_accounts_path
         elif df is self.Categories:
             path = self._categories_path
@@ -81,5 +83,34 @@ class Database:
 
         setattr(db, table_name, df)
         db._save_df(df)
+
+    def get_transactions_by_account(self, account_id: UUID) -> list[TransactionView]:
+        df = db.Transactions
+
+        if df.empty:
+            return []
+
+        filtered = df[df["account_id"] == str(account_id)]
+
+        categories = {
+            c.id: c
+            for c in self.Categories()
+        }
+
+        accounts = {
+            a.id: a
+            for a in self.BankAccount()
+        }
+
+        return [
+            TransactionView(
+                transaction=t,
+                category=categories.get(t.category_id),
+                account=accounts.get(t.account_id),
+            )
+            for row in filtered.to_dict(orient="records")
+            for t in [Transaction.model_validate(row)]
+        ]
+
 
 db = Database()

@@ -11,12 +11,13 @@ pages = {
             title="Home",
             # icon="🔥",
             # help="test",
+            default=True
         ),
         st.Page(PAGE_PATH.STATS, title="Stats")
     ],
     "Settings": [
         st.Page(PAGE_PATH.MANAGE_CATEGORIES, title="Manage Categories"),
-        st.Page(PAGE_PATH.MANAGE_ACCOUNTS, title="Manage Accounts", default=True),
+        st.Page(PAGE_PATH.MANAGE_ACCOUNTS, title="Manage Accounts"),
         st.Page(PAGE_PATH.ACCOUNT, visibility="hidden"),
         st.Page(PAGE_PATH.CATEGORY, visibility="hidden")
     ],

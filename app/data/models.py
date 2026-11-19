@@ -22,12 +22,6 @@ class TransactionType(str, Enum):
 # allow deleting an account
 # don't allow duplicate account names
 
-NonEmptyId = Annotated[
-    str,
-    StringConstraints(strip_whitespace=True, min_length=36)
-]
-
-
 class BankAccount(BaseModel):
     """
     The bank account
@@ -55,15 +49,19 @@ class Category(BaseModel):
 # add edit view delete
 class Transaction(BaseModel):
     id: UUID = Field(default_factory=uuid4)
-    name: str = Field(min_length=3, default="")  # default should be the category name
-    account_id: NonEmptyId
-    category_id: NonEmptyId
-    amount: int = Field(gt=0)
+    title: str = Field(min_length=3, default="")  # default should be the category name
+    account_id: UUID = Field()
+    category_id: UUID = Field()
+    amount: float = Field(gt=0)
     date: dt.date = Field(default_factory=dt.date.today)
     type: TransactionType
     notes: str = Field(default="")
     attachments: list[Attachment] = Field(default=[])  # ids for images
 
+class TransactionView(BaseModel):
+    transaction: Transaction
+    category: Category | None = None
+    account: BankAccount | None = None
 
 class Attachment(BaseModel):
     id: UUID = Field(default_factory=uuid4)
