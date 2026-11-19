@@ -1,12 +1,4 @@
-.PHONY: run init check
-
-init:
-	#uv init
-	uv add streamlit
-	uv add pandas
-	uv add plotly
-	uv add watchdog
-	uv run streamlit skills
+.PHONY: run check
 
 run:
 	uv run streamlit run app/streamlit_app.py
