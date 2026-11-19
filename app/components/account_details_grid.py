@@ -26,7 +26,7 @@ def details_grid(account: BankAccount):
         key = f"name_{account.id}"
 
         grid.text_input(
-            label="",
+            label="Name",
             label_visibility="collapsed",
             value=account.name,
             key=key,
@@ -39,7 +39,7 @@ def details_grid(account: BankAccount):
         key = f"balance_{account.id}"
 
         grid.number_input(
-            label="",
+            label="Balance",
             label_visibility="collapsed",
             value=account.balance,
             min_value=0,

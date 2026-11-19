@@ -1,27 +1,35 @@
 import streamlit as st
 from iso4217 import Currency
 
-from app.data.mock_data import bank_accounts
 from app.data.models import BankAccount
 from app.data.page_paths import PAGE_PATH
 from app.data.streamlit_state_keys import ACCOUNTS_ERROR, ACCOUNT_SELECTED_ACCOUNT
 from app.db.database import db
 
-# TODO: add retrival
-accounts = bank_accounts
-
+def view_account(to_account: BankAccount):
+    st.session_state[ACCOUNT_SELECTED_ACCOUNT] = to_account
+    st.switch_page(st.Page(PAGE_PATH.ACCOUNT))
 
 def add_account_btn():
-    db.save(BankAccount(
-        name="NBB",
+    new_account = BankAccount(
+        name="Default",
         balance=0,
         color="yellow",
         icon=":material/savings:",
         currency=Currency.BHD,
-    ),
-        op="add"
     )
 
+    db.save(new_account, op="add")
+
+    view_account(new_account)
+
+
+bank_accounts: list[BankAccount] = [
+    BankAccount.model_validate(row)
+    for row in db.BankAccount.to_dict(orient="records")
+]
+
+# TODO: add paging
 
 with st.container(
         horizontal=True,
@@ -58,9 +66,12 @@ for account in bank_accounts:
             st.write(f"{account.balance}{account.currency.code}")
 
         with col4:
-            if st.button("", type="tertiary", icon=":material/manage_search:"):
-                st.session_state[ACCOUNT_SELECTED_ACCOUNT] = account
-                st.switch_page(st.Page(PAGE_PATH.ACCOUNT))
+            st.button("",
+                      type="tertiary",
+                      icon=":material/manage_search:",
+                      key=f"view_btn_{account.id}",
+                      on_click=lambda: view_account(account)
+                      )
 
 error_msg = st.session_state.get(ACCOUNTS_ERROR)
 if error_msg:
