@@ -1,5 +1,7 @@
 import streamlit as st
 
+# initiate db
+import db.database as db  # noqa: F401
 from app.data.page_paths import PAGE_PATH
 
 pages = {
