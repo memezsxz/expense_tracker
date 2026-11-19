@@ -11,10 +11,12 @@ class Color(str, Enum):
     GREEN = "green"
     BLUE = "blue"
 
+
 class TransactionType(str, Enum):
     INCOME = "income"
-    TRANSFER = "transfer" # transfer between accounts
+    TRANSFER = "transfer"  # transfer between accounts
     EXPENSE = "expense"
+
 
 # screen to add bank accounts
 # allow select for a color
@@ -33,6 +35,7 @@ NonEmptyId = Annotated[
     StringConstraints(strip_whitespace=True, min_length=36)
 ]
 
+
 class BankAccount(BaseModel):
     """
     The bank account
@@ -43,6 +46,7 @@ class BankAccount(BaseModel):
     color: HexColor
     icon: str = Field()
 
+
 # add edit and view delete
 # view stats
 # no duplicate
@@ -52,12 +56,20 @@ class Category(BaseModel):
     color: HexColor
     icon: str = Field()
 
+
 # add edit view delete
 class Transaction(BaseModel):
     id: UUID = Field(default_factory=uuid4)
-    name: str = Field(min_length=3, default="") # default should be the category name
+    name: str = Field(min_length=3, default="")  # default should be the category name
     account_id: NonEmptyId
     category_id: NonEmptyId
     amount: int = Field(gt=0)
     date: dt.date = Field(default_factory=dt.date.today)
     type: TransactionType
+    notes: str = Field(default="")
+    attachments: list[Attachment] = Field(default=[])  # ids for images
+
+
+class Attachment(BaseModel):
+    id: UUID = Field(default_factory=uuid4)
+    path: str = Field(min_length=3)
