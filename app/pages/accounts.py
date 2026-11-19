@@ -7,7 +7,20 @@ from app.data.streamlit_state_keys import ACCOUNTS_ERROR, ACCOUNT_SELECTED_ACCOU
 # TODO: add retrival
 accounts = bank_accounts
 
-st.title('Manage Accounts')
+with st.container(
+        horizontal=True,
+        horizontal_alignment="distribute",
+        vertical_alignment="center",
+        gap="small",
+):
+    st.title("Manage Accounts")
+
+    st.button(
+        "Add New Category",
+        type="secondary",
+        icon=":material/add:",
+    )
+    # TODO: add add
 
 st.space(size="small")
 
