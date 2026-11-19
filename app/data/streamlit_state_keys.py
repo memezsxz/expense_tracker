@@ -1,3 +1,3 @@
-ACCOUNT_SELECTED_ACCOUNT_ID = "account_selected_account_id"
+ACCOUNT_SELECTED_ACCOUNT = "account_selected_account"
 
 ACCOUNTS_ERROR = "accounts_error"

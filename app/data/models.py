@@ -1,17 +1,12 @@
 import datetime as dt
 from enum import Enum
 from typing import Annotated
-from typing import Literal
 from uuid import UUID, uuid4
 
 from iso4217 import Currency
 from pydantic import BaseModel, Field, StringConstraints
 
-BadgeColor = Literal[
-    "red", "orange", "yellow",
-    "blue", "green", "violet",
-    "gray", "grey", "primary"
-]
+from app.data.colors import BadgeColor
 
 
 class TransactionType(str, Enum):

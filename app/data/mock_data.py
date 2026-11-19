@@ -7,7 +7,7 @@ bank_accounts = [
         name="NBB",
         balance=20,
         color="red",
-        icon=":material/p2p:",
+        icon=":material/savings:",
         currency=Currency.BHD,
     )
 ]
