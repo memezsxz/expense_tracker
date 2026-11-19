@@ -2,7 +2,7 @@ import streamlit as st
 
 from app.data.mock_data import bank_accounts
 from app.data.page_paths import PAGE_PATH
-from app.data.streamlit_state_keys import ACCOUNTS_ERROR, ACCOUNT_SELECTED_ACCOUNT_ID
+from app.data.streamlit_state_keys import ACCOUNTS_ERROR, ACCOUNT_SELECTED_ACCOUNT
 
 # TODO: add retrival
 accounts = bank_accounts
@@ -30,7 +30,7 @@ for account in bank_accounts:
 
         with col4:
             if st.button("", type="tertiary", icon=":material/manage_search:"):
-                st.session_state[ACCOUNT_SELECTED_ACCOUNT_ID] = account.id
+                st.session_state[ACCOUNT_SELECTED_ACCOUNT] = account
                 st.switch_page(st.Page(PAGE_PATH.ACCOUNT))
 
 error_msg = st.session_state.get(ACCOUNTS_ERROR)
