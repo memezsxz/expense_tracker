@@ -1,12 +1,29 @@
 import os
 from pathlib import Path
+from typing import Literal
 
 import pandas as pd
+from pydantic import BaseModel
+
+from app.data.models import BankAccount, Category, Transaction, Attachment
 
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
 DATA_DIR = PROJECT_ROOT / "data"
 
 DATA_DIR.mkdir(parents=True, exist_ok=True)
+
+OPERATION = Literal[
+    "add",
+    "edit",
+    "delete",
+]
+
+TABLES = {
+    BankAccount: "BankAccount",
+    Category: "Categories",
+    Transaction: "Transactions",
+    Attachment: "Attachments",
+}
 
 class Database:
     _categories_path = DATA_DIR / "categories.csv"
@@ -15,31 +32,18 @@ class Database:
     _attachments_path = DATA_DIR / "attachments.csv"
 
     def __init__(self):
-        self.BankAccount: pd.DataFrame = (
-            pd.read_csv(self._bank_accounts_path)
-            if os.path.isfile(self._bank_accounts_path)
-            else pd.DataFrame()
-        )
+        self.BankAccount: pd.DataFrame = self._load_data(self._bank_accounts_path)
+        self.Categories: pd.DataFrame = self._load_data(self._categories_path)
+        self.Transactions: pd.DataFrame = self._load_data(self._transactions_path)
+        self.Attachments: pd.DataFrame = self._load_data(self._attachments_path)
 
-        self.Categories: pd.DataFrame = (
-            pd.read_csv(self._categories_path)
-            if os.path.isfile(self._categories_path)
-            else pd.DataFrame()
-        )
+    def _load_data(self, path: Path) -> pd.DataFrame:
+        return (pd.read_csv(path)
+                if os.path.isfile(path)
+                else pd.DataFrame()
+                )
 
-        self.Transactions: pd.DataFrame = (
-            pd.read_csv(self._transactions_path)
-            if os.path.isfile(self._transactions_path)
-            else pd.DataFrame()
-        )
-
-        self.Attachments: pd.DataFrame = (
-            pd.read_csv(self._attachments_path)
-            if os.path.isfile(self._attachments_path)
-            else pd.DataFrame()
-        )
-
-    def save_df(self, df: pd.DataFrame):
+    def _save_df(self, df: pd.DataFrame):
         if df is self.BankAccount:
             path = self._bank_accounts_path
         elif df is self.Categories:
@@ -52,5 +56,30 @@ class Database:
             raise ValueError("Unknown DataFrame")
 
         df.to_csv(path, index=False)
+
+    def save(self, model: BaseModel, op: OPERATION):
+        table_name = TABLES[type(model)]
+
+        df = getattr(db, table_name).copy()
+        model_dump = model.model_dump(mode="json")
+
+        match op:
+            case "add":
+                df = pd.concat(
+                    [df, pd.DataFrame([model_dump])],
+                    ignore_index=True
+                )
+
+            case "edit":
+                filtered = df["id"] == str(model_dump.get("id"))
+
+                for field, value in model_dump.items():
+                    df.loc[filtered, field] = value
+
+            case "delete":
+                df = df[df["id"] != str(model_dump.get("id"))].copy()
+
+        setattr(db, table_name, df)
+        db._save_df(df)
 
 db = Database()

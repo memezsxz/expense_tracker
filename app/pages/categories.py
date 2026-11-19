@@ -17,7 +17,7 @@ with st.container(
     st.title("Manage Categories")
 
     st.button(
-        "Add New Account",
+        "Add New Category",
         type="secondary",
         icon=":material/add:",
     )
