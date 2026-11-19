@@ -1,5 +1,6 @@
 import streamlit as st
 
+from app.components.category_details_grid import details_grid
 from app.data.models import Category
 from app.data.page_paths import PAGE_PATH
 from app.data.streamlit_state_keys import CATEGORY_SELECTED_CATEGORY, \
@@ -25,3 +26,12 @@ with st.container(
         icon=":material/delete:",
     )
     # TODO: add delete
+
+st.divider()
+
+details_grid(category)
+
+st.divider()
+
+st.markdown("### Stats:", anchors=False)
+# TODO: add stats
