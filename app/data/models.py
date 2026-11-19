@@ -38,6 +38,7 @@ class BankAccount(BaseModel):
     color: BadgeColor = Field(default="blue")
     icon: str = Field()
     currency: Currency = Field(default=Currency.BHD)
+    date_created: dt.date = Field(default_factory=dt.date.today)
 
 
 # add edit and view delete
@@ -48,6 +49,7 @@ class Category(BaseModel):
     name: str = Field(min_length=3)
     color: BadgeColor = Field(default="blue")
     icon: str = Field()
+    date_created: dt.date = Field(default_factory=dt.date.today)
 
 
 # add edit view delete
