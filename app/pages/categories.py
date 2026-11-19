@@ -1,12 +1,33 @@
 import streamlit as st
 
-from app.data.mock_data import  mock_categories
+from app.components.alert import show_alert
+from app.data.models import Category
 from app.data.page_paths import PAGE_PATH
-from app.data.streamlit_state_keys import ACCOUNTS_ERROR, ACCOUNT_SELECTED_ACCOUNT, CATEGORIES_ERROR, \
-    CATEGORY_SELECTED_CATEGORY
+from app.data.streamlit_state_keys import CATEGORY_SELECTED_CATEGORY, CATEGORIES_ALERT_MSG, CATEGORIES_ALERT_ICON
+from app.db.database import db
 
-# TODO: add retrival
-categories = mock_categories
+
+def view_category(to_account: Category):
+    st.session_state[CATEGORY_SELECTED_CATEGORY] = to_account
+    st.switch_page(st.Page(PAGE_PATH.CATEGORY))
+
+
+def add_category():
+    new_category = Category(
+        name="Default",
+        color="yellow",
+        icon=":material/savings:",
+    )
+
+    db.save(new_category, op="add")
+
+    view_category(new_category)
+
+
+categories: list[Category] = [
+    Category.model_validate(row)
+    for row in db.Categories.to_dict(orient="records")
+]
 
 with st.container(
         horizontal=True,
@@ -20,30 +41,31 @@ with st.container(
         "Add New Category",
         type="secondary",
         icon=":material/add:",
+        on_click=add_category,
     )
-    # TODO: add add
 
 st.space(size="small")
 
 for category in categories:
     cat_con = st.container(border=True)
-    with cat_con:  # click on to view Account page
+    with cat_con:  # click on to view category page
         col1, col2, col3 = st.columns([0.8, 9, 0.5], vertical_alignment="center")
 
         with col1:
-            # account icon in circle of color
+            # category icon in circle of color
             st.badge(label="", icon=category.icon, color=category.color)
 
         with col2:
-            # account name
+            # category name
             st.write(category.name)
 
         with col3:
-            if st.button("", type="tertiary", icon=":material/manage_search:"):
-                st.session_state[CATEGORY_SELECTED_CATEGORY] = category
-                st.switch_page(st.Page(PAGE_PATH.CATEGORY))
+            st.button("",
+                      type="tertiary",
+                      icon=":material/manage_search:",
+                      key=f"view_btn_{category.id}",
+                      on_click=view_category,
+                      args=(category,),
+                      )
 
-error_msg = st.session_state.get(CATEGORIES_ERROR)
-if error_msg:
-    st.toast(f":red[{error_msg}]", icon="🚨")
-    st.session_state[CATEGORIES_ERROR] = None
+show_alert(CATEGORIES_ALERT_MSG, CATEGORIES_ALERT_ICON)

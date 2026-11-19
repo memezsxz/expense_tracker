@@ -1,6 +1,7 @@
 import streamlit as st
 from iso4217 import Currency
 
+from app.components.alert import show_alert
 from app.data.models import BankAccount
 from app.data.page_paths import PAGE_PATH
 from app.data.streamlit_state_keys import ACCOUNT_SELECTED_ACCOUNT, ACCOUNTS_ALERT_ICON, ACCOUNTS_ALERT_MSG
@@ -81,9 +82,4 @@ for account in bank_accounts:
                       args=(account,),
                       )
 
-alert_msg = st.session_state.get(ACCOUNTS_ALERT_MSG)
-alert_icon = st.session_state.get(ACCOUNTS_ALERT_ICON)
-if alert_msg:
-    st.toast(alert_msg, icon=alert_icon)
-    st.session_state[ACCOUNTS_ALERT_MSG] = None
-    st.session_state[ACCOUNTS_ALERT_ICON] = None
+show_alert(ACCOUNTS_ALERT_MSG, ACCOUNTS_ALERT_ICON)
