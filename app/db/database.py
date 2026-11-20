@@ -137,5 +137,40 @@ class Database:
             for t in [Transaction.model_validate(row)]
         ]
 
+    def get_account_balance(self, account_id):
+        df = self.Transactions
+        account_id = str(account_id)
+
+        income = df[
+            (df["account_id"] == account_id) &
+            (df["type"] == "income")
+            ]["amount"].sum()
+
+        expenses = df[
+            (df["account_id"] == account_id) &
+            (df["type"] == "expense")
+            ]["amount"].sum()
+
+        transfers_out = df[
+            (df["account_id"] == account_id) &
+            (df["type"] == "transfer")
+            ]["amount"].sum()
+
+        transfers_in = df[
+            (df["to_account_id"] == account_id) &
+            (df["type"] == "transfer")
+            ]["amount"].sum()
+
+        return income - expenses + transfers_in - transfers_out
+
+    def update_account_balance(self, account_id):
+        balance = self.get_account_balance(account_id)
+
+        self.BankAccounts.loc[
+            self.BankAccounts["id"] == str(account_id),
+            "balance"
+        ] = balance
+
+        self.BankAccounts.to_csv(self._bank_accounts_path, index=False)
 
 db = Database()

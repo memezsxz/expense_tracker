@@ -119,7 +119,7 @@ def account_details_grid(account: BankAccount):
             )
 
     name_in()
-    balance_in()
+    # balance_in()
     color_in()
     icon_in()
     currency_in()

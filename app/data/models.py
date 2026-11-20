@@ -28,7 +28,7 @@ class BankAccount(BaseModel):
     """
     id: UUID = Field(default_factory=uuid4)
     name: str = Field(min_length=3)
-    balance: int = Field(ge=0, default=0)
+    balance: float = Field(ge=0.0, default=0.0)
     color: BadgeColor = Field(default="blue")
     icon: str = Field()
     currency: Currency = Field(default=Currency.BHD)

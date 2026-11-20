@@ -9,7 +9,8 @@ from app.data.page_paths import PAGE_PATH
 from app.data.streamlit_state_keys import ACCOUNT_SELECTED_ACCOUNT, ACCOUNTS_ALERT_MSG, ACCOUNTS_ALERT_ICON
 from app.db.database import db
 
-account = BankAccount.model_validate(st.session_state.get(ACCOUNT_SELECTED_ACCOUNT))
+selected = st.session_state.get(ACCOUNT_SELECTED_ACCOUNT)
+account = BankAccount.model_validate(selected.model_dump())
 # account = BankAccount.model_validate(db.BankAccounts.head(3).to_dict(orient="records")[2])
 # st.session_state[ACCOUNT_SELECTED_ACCOUNT] = account
 
@@ -21,9 +22,21 @@ if not account:
 
 
 def delete_account(to_delete_account: BankAccount):
+    account_id = str(to_delete_account.id)
+
+    if (
+            (db.Transactions["account_id"] == account_id) |
+            (db.Transactions["to_account_id"] == account_id)
+    ).any():
+        st.session_state[ACCOUNTS_ALERT_MSG] = ":red[Cannot delete an account that has transactions.]"
+        st.session_state[ACCOUNTS_ALERT_ICON] = "🚨"
+
+        st.switch_page(st.Page(PAGE_PATH.MANAGE_ACCOUNTS))
+        return
+
     db.save(to_delete_account, "delete")
-    success_msg = "Account Deleted Successfully"
-    st.session_state[ACCOUNTS_ALERT_MSG] = f":green[{success_msg}]"
+
+    st.session_state[ACCOUNTS_ALERT_MSG] = ":green[Account Deleted Successfully]"
     st.session_state[ACCOUNTS_ALERT_ICON] = "✅"
 
     st.switch_page(st.Page(PAGE_PATH.MANAGE_ACCOUNTS))
@@ -54,30 +67,25 @@ st.divider()
 st.markdown("### Stats:", anchors=False)
 # TODO: add stats
 
-col1, col2, col3, col4 = st.columns(4)
+col1, col2, col3 = st.columns(3)
 
 df = db.Transactions[(db.Transactions["account_id"] == str(account.id)) & db.Transactions["to_account_id"].isna()]
 # to_df = db.Transactions[(db.Transactions["to_account_id"] == str(account.id))]
 df["date"] = pd.to_datetime(df["date"])
 
-# balance
-totals = df.groupby("type")["amount"].sum()
-balance = totals.get("income", 0) - totals.get("expense", 0)
-
-stat_container(col1, f"**Balance**", f"{balance:.2f}")
 
 total_spend = df[(df["type"] == "expense")]["amount"].sum()
 total_income = df[(df["type"] == "income")]["amount"].sum()
 
-stat_container(col2, f"**Total Income**", f"{total_income:.2f}")
-stat_container(col3, f"**Total Expense**", f"{total_spend:.2f}")
+stat_container(col1, f"**Total Income**", f"{total_income:.2f}")
+stat_container(col2, f"**Total Expense**", f"{total_spend:.2f}")
 
 daily_spend_avg = (
         df[df["type"] == "expense"]["amount"].sum()
         / ((df["date"].max() - df["date"].min()).days + 1)
 )
 
-stat_container(col4, f"**Avg daily Spend**", f"{daily_spend_avg:.2f}")
+stat_container(col3, f"**Avg daily Spend**", f"{daily_spend_avg:.2f}")
 
 # balance history
 

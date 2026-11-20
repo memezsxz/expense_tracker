@@ -59,7 +59,7 @@ if len(bank_accounts) == 0:
 for account in bank_accounts:
     acc_con = st.container(border=True)
     with acc_con:  # click on to view Account page
-        col1, col2, col3, col4 = st.columns([0.8, 8, 1, 0.5], vertical_alignment="center")
+        col1, col2, col3, col4 = st.columns([0.8, 7, 2, 0.5], vertical_alignment="center")
 
         with col1:
             # account icon in circle of color
@@ -71,7 +71,7 @@ for account in bank_accounts:
 
         with col3:
             # current account balance
-            st.write(f"{account.balance}{account.currency.code}")
+            st.write(f"{account.balance:.2f}{account.currency.code}")
 
         with col4:
             st.button("",
