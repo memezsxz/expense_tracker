@@ -1,0 +1,15 @@
+id,name,color,icon,date_created
+afa5bcbf-3a09-4824-bba6-267cc8b6c91d,Transport,yellow,:material/savings:,2026-11-20
+8e240e81-0a0b-4aac-914b-7a88c10e5e86,Values,orange,:material/credit_card:,2026-11-20
+74e11dc7-32a0-45c9-ad30-957f8d142747,Cars,violet,:material/paid:,2026-11-20
+744db887-1538-56fb-b109-976b99bc6321,Groceries,green,:material/local_grocery_store:,2026-11-20
+84c0b8e2-d3c5-579f-aa04-1f1e6cac6cf2,Dining,orange,:material/restaurant:,2026-11-20
+0af45a4f-4f15-52d0-985f-aacd024769d2,Utilities,yellow,:material/bolt:,2026-11-20
+2b16332e-9c35-5c54-afb8-80dd5c1d4e2d,Shopping,violet,:material/shopping_bag:,2026-11-20
+ab781104-57b6-5898-84e2-564d9baa1298,Entertainment,blue,:material/movie:,2026-11-20
+350056d4-7e8d-5296-aacc-c8baa66de3ff,Salary,green,:material/payments:,2026-11-20
+a7671fdb-2173-5af2-94e4-c3f4a3189cd2,Freelance,green,:material/work:,2026-11-20
+27e57520-d914-5f41-8012-ad17803ff1ec,Subscriptions,gray,:material/subscriptions:,2026-11-20
+714e6dc1-df71-575d-8fde-b6e7719896d0,Healthcare,red,:material/medical_services:,2026-11-20
+e5aed031-2190-5786-a3ee-4b12b99cf827,Education,blue,:material/school:,2026-11-20
+f1d2088a-b568-5b23-90a8-d4e21f1446a0,Housing,orange,:material/home:,2026-11-20
