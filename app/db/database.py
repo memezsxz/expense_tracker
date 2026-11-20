@@ -104,6 +104,10 @@ class Database:
             & (dates.dt.month == month)
             ]
 
+        filtered["date"] = pd.to_datetime(filtered["date"])
+
+        filtered.sort_values("date", ascending=False)
+
         categories = {
             c.id: c
             for c in [

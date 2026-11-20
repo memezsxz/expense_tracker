@@ -24,10 +24,7 @@ def check_can_add_transaction():
 
     return True
 
-
-@st.dialog(
-    title="Create Transaction", width="medium", position="center", )
-def create_transaction_dialog():
+def open_create_transaction_dialog():
     default_category = Category.model_validate(db.Categories.iloc[0].to_dict())
 
     transaction = Transaction(
@@ -41,6 +38,12 @@ def create_transaction_dialog():
     db.save(transaction, op="add")
 
     st.session_state[TRANSACTIONS_SELECTED_TRANSACTION] = transaction
+
+    create_transaction_dialog(transaction)
+
+@st.dialog(
+    title="Create Transaction", width="medium", position="center", )
+def create_transaction_dialog(transaction: Transaction):
     transactions_details_grid(transaction)
 
 
@@ -71,7 +74,7 @@ with col2:
 
 with col3:
     if st.button(label="Add", icon=":material/add:", width="stretch", ) and check_can_add_transaction():
-        create_transaction_dialog()
+        open_create_transaction_dialog()
 
 st.space(size="small")
 
