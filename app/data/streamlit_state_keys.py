@@ -14,3 +14,6 @@ HOME_ALERT_ICON = "home_alert_icon"
 TRANSACTIONS_SELECTED_TRANSACTION = "transactions_selected_transaction"
 
 HOME_SELECTED_MONTH = "home_selected_month"
+
+DASHBOARD_ALERT_MSG = "dashboard_alert_msg"
+DASHBOARD_ALERT_ICON = "dashboard_alert_icon"

@@ -141,5 +141,5 @@ with st.container(border=True, horizontal_alignment="center"):
 
 # history
 df = df.drop(columns=["id", "category_id"])
-st.divider()
+st.subheader("Overview", divider="gray", anchor=False)
 st.dataframe(df, hide_index=True)
