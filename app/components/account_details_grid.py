@@ -39,19 +39,20 @@ def account_details_grid(account: BankAccount):
             args=("name", key),
         )
 
-    def balance_in():
-        grid.write("Balance")
-        key = f"balance_{account.id}"
+    def monthly_limit_in():
+        grid.write("Monthly Budget")
+        key = f"monthly_limit_{account.id}"
 
         grid.number_input(
-            label="Balance",
+            label="Monthly Limit",
             label_visibility="collapsed",
-            value=account.balance,
-            min_value=0,
-            max_value=10_000_000,
+            value=float(account.monthly_limit),
+            min_value=0.0,
+            max_value=10_000_000.0,
+            step=10.0,
             key=key,
             on_change=update_account,
-            args=("balance", key),
+            args=("monthly_limit", key),
         )
 
     def color_in():
@@ -119,7 +120,7 @@ def account_details_grid(account: BankAccount):
             )
 
     name_in()
-    # balance_in()
+    monthly_limit_in()
     color_in()
     icon_in()
     currency_in()

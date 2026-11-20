@@ -1,6 +1,6 @@
 import datetime
 from collections import defaultdict
-
+import pandas as pd
 import streamlit as st
 
 from app.components.alert import show_alert
@@ -26,6 +26,25 @@ selected_bank_account = actions_col(bank_accounts)
 search = st.session_state.get("home_search", "").strip()
 
 selected_month = change_month_col()
+
+df = db.Transactions
+df["date"] = pd.to_datetime(df["date"])
+
+monthly_spending = df[
+    (df["account_id"] == str(selected_bank_account.id)) &
+    (df["type"] == "expense") &
+    (df["date"].dt.year == selected_month.year) &
+    (df["date"].dt.month == selected_month.month)
+]["amount"].sum()
+
+budget = selected_bank_account.monthly_limit
+
+if budget > 0:
+    if monthly_spending > budget:
+        st.error("You have exceeded your monthly limit!")
+    elif monthly_spending >= budget * 0.9:
+        st.warning("You have used 90% or more of your monthly limit!")
+
 
 if len(bank_accounts) == 0:
     with st.container(vertical_alignment="center"):
