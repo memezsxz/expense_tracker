@@ -1,4 +1,6 @@
 import datetime
+from collections import defaultdict
+from itertools import groupby
 
 import streamlit as st
 
@@ -49,8 +51,7 @@ transactions: list[TransactionView] = (
     )
 )
 
-st.divider()
-# st.space(size="small")
+st.space(size="small")
 
 if search:
     transactions = [
@@ -62,7 +63,17 @@ if search:
            )
     ]
 
+days = defaultdict(list)
+
 for t in transactions:
-    transaction_expandable(t)
+    days[t.transaction.date].append(t)
+
+for day in sorted(days, reverse=True):
+    st.divider()
+    st.markdown("##### " + day.strftime("%A, %d %B"))
+
+    for t in days[day]:
+        transaction_expandable(t)
+
 
 show_alert(HOME_ALERT_MSG, HOME_ALERT_ICON)

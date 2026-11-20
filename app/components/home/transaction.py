@@ -9,7 +9,7 @@ def view_transaction(transaction: TransactionView):
 def transaction_expandable(transaction_view: TransactionView):  # TODO: change to an expandable
     t_con = st.container(border=True)
     with t_con:  # click on to view Account page
-        col1, col2, col3, col4 = st.columns([0.8, 8, 1, 0.5], vertical_alignment="center")
+        col1, col2, col3, col4 = st.columns([0.8, 7.5, 1.5, 0.5], vertical_alignment="center")
 
         with col1:
             st.badge(label="", icon=transaction_view.category.icon, color=transaction_view.category.color)
