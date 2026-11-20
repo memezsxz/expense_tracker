@@ -1,10 +1,10 @@
 import datetime as dt
 from enum import Enum
-from typing import Annotated
 from uuid import UUID, uuid4
 
+import pandas as pd
 from iso4217 import Currency
-from pydantic import BaseModel, Field, StringConstraints
+from pydantic import BaseModel, Field, field_validator
 
 from app.data.colors import BadgeColor
 
@@ -21,12 +21,6 @@ class TransactionType(str, Enum):
 # allow setting the current balance
 # allow deleting an account
 # don't allow duplicate account names
-
-NonEmptyId = Annotated[
-    str,
-    StringConstraints(strip_whitespace=True, min_length=36)
-]
-
 
 class BankAccount(BaseModel):
     """
@@ -55,16 +49,29 @@ class Category(BaseModel):
 # add edit view delete
 class Transaction(BaseModel):
     id: UUID = Field(default_factory=uuid4)
-    name: str = Field(min_length=3, default="")  # default should be the category name
-    account_id: NonEmptyId
-    category_id: NonEmptyId
-    amount: int = Field(gt=0)
+    title: str = Field(min_length=3, default="Default")  # default should be the category name
+    account_id: UUID = Field()
+    to_account_id: UUID | None = None
+    category_id: UUID | None = None
+    amount: float = Field(gt=0)
     date: dt.date = Field(default_factory=dt.date.today)
     type: TransactionType
-    notes: str = Field(default="")
-    attachments: list[Attachment] = Field(default=[])  # ids for images
+    notes: str = ""
 
+    @field_validator("notes", mode="before")
+    @classmethod
+    def handle_empty_notes(cls, value):
+        return "" if pd.isna(value) else value
 
-class Attachment(BaseModel):
-    id: UUID = Field(default_factory=uuid4)
-    path: str = Field(min_length=3)
+    @field_validator("to_account_id", "category_id", mode="before")
+    @classmethod
+    def handle_empty_uuid(cls, value):
+        if value is None or value == "" or pd.isna(value):
+            return None
+
+        return value
+
+class TransactionView(BaseModel):
+    transaction: Transaction
+    category: Category | None = None
+    account: BankAccount | None = None

@@ -1,6 +1,6 @@
 import streamlit as st
 from app.db.database import db
-from app.components.account_details_grid import details_grid
+from app.components.account_details_grid import account_details_grid
 from app.data.models import BankAccount
 from app.data.page_paths import PAGE_PATH
 from app.data.streamlit_state_keys import ACCOUNT_SELECTED_ACCOUNT, ACCOUNTS_ALERT_MSG, ACCOUNTS_ALERT_ICON
@@ -41,7 +41,7 @@ with st.container(
 
 st.divider()
 
-details_grid(account)
+account_details_grid(account)
 
 st.divider()
 

@@ -22,7 +22,7 @@ def update_account(field: str, widget_key: str):
 
 
 
-def details_grid(account: BankAccount):
+def account_details_grid(account: BankAccount):
     account = st.session_state[ACCOUNT_SELECTED_ACCOUNT]
     grid = st.grid(2, vertical_alignment="center")
 
