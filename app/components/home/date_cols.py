@@ -39,6 +39,7 @@ def change_month_col() -> datetime.date:
         st.markdown(
             f"#### {selected_month:%B} {selected_month.year}",
             text_alignment="center",
+            anchors=False
         )
 
     with next_col:

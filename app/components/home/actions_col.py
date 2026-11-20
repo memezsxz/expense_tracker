@@ -32,13 +32,13 @@ def _create_transaction_dialog(transaction: Transaction):
     transactions_details_grid(transaction)
 
 
-def _open_create_transaction_dialog(selected_bank_account: BankAccount):
+def _open_create_transaction_dialog(selected_bank_account: BankAccount, type: TransactionType):
     default_category = Category.model_validate(db.Categories.iloc[0].to_dict())
 
     transaction = Transaction(
         title=default_category.name,
         amount=1,
-        type=TransactionType.EXPENSE,
+        type=type,
         category_id=default_category.id,
         account_id=selected_bank_account.id
     )
@@ -51,16 +51,15 @@ def _open_create_transaction_dialog(selected_bank_account: BankAccount):
 
 
 def actions_col(bank_accounts: list[BankAccount]) -> BankAccount:
-    col1, col2, col3 = st.columns([6, 3.5, 1.5])
+    col1, col2, col3, col4, col5 = st.columns([4, 3, 0.7, 0.7 ,0.7])
 
     with col1:
-        search = st.text_input(
+        st.text_input(
             "Search",
             placeholder="Search transactions",
             label_visibility="collapsed",
             key="home_search",
         )
-        # TODO: add on change do search
 
     with col2:
         selected_bank_account: BankAccount = st.selectbox(
@@ -71,7 +70,18 @@ def actions_col(bank_accounts: list[BankAccount]) -> BankAccount:
         )
 
     with col3:
-        if st.button(label="Add", icon=":material/add:", width="stretch", ) and _check_can_add_transaction():
-            _open_create_transaction_dialog(selected_bank_account)
+        if st.button("", icon=":material/trending_down:",
+                     width="stretch", key="add_expense", help="Add Expense") and _check_can_add_transaction():
+            _open_create_transaction_dialog(selected_bank_account, TransactionType.EXPENSE)
+
+    with col4:
+        if st.button("", icon=":material/trending_up:",
+                     width="stretch", key="add_income", help="Add Income") and _check_can_add_transaction():
+            _open_create_transaction_dialog(selected_bank_account, TransactionType.INCOME)
+
+    with col5:
+        if st.button("", icon=":material/swap_horiz:",
+                     width="stretch", key="add_transfer", help="Add Transfer") and _check_can_add_transaction():
+            _open_create_transaction_dialog(selected_bank_account, TransactionType.TRANSFER)
 
     return selected_bank_account

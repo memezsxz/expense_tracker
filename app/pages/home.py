@@ -1,6 +1,5 @@
 import datetime
 from collections import defaultdict
-from itertools import groupby
 
 import streamlit as st
 
@@ -51,8 +50,6 @@ transactions: list[TransactionView] = (
     )
 )
 
-st.space(size="small")
-
 if search:
     transactions = [
         t for t in transactions
@@ -62,6 +59,14 @@ if search:
                    and search.casefold() in t.category.name.casefold()
            )
     ]
+
+if not transactions:
+    with st.container(vertical_alignment="center"):
+        st.space(size="large")
+        st.markdown(f":gray[No transactions found for {selected_month:%B} of {selected_month.year}]",
+                    text_alignment="center"
+                    )
+    st.stop()
 
 days = defaultdict(list)
 
@@ -74,6 +79,5 @@ for day in sorted(days, reverse=True):
 
     for t in days[day]:
         transaction_expandable(t)
-
 
 show_alert(HOME_ALERT_MSG, HOME_ALERT_ICON)
