@@ -32,7 +32,8 @@ def delete_category(to_delete_category: Category):
     category_id = str(to_delete_category.id)
 
     if (db.Transactions["category_id"] == category_id).any():
-        st.error("Cannot delete a category that has transactions.")
+        st.session_state[CATEGORIES_ALERT_MSG] = ":red[Cannot delete a category that has transactions.]"
+        st.session_state[CATEGORIES_ALERT_ICON] = "🚨"
         return
 
     db.save(to_delete_category, "delete")
@@ -41,7 +42,6 @@ def delete_category(to_delete_category: Category):
     st.session_state[CATEGORIES_ALERT_ICON] = "✅"
 
     st.switch_page(st.Page(PAGE_PATH.MANAGE_CATEGORIES))
-
 with st.container(
         horizontal=True,
         horizontal_alignment="distribute",

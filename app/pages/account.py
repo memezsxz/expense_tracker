@@ -36,8 +36,6 @@ def delete_account(to_delete_account: BankAccount):
     ).any():
         st.session_state[ACCOUNTS_ALERT_MSG] = ":red[Cannot delete an account that has transactions.]"
         st.session_state[ACCOUNTS_ALERT_ICON] = "🚨"
-
-        st.switch_page(st.Page(PAGE_PATH.MANAGE_ACCOUNTS))
         return
 
     db.save(to_delete_account, "delete")
