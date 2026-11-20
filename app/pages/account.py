@@ -9,6 +9,12 @@ from app.data.page_paths import PAGE_PATH
 from app.data.streamlit_state_keys import ACCOUNT_SELECTED_ACCOUNT, ACCOUNTS_ALERT_MSG, ACCOUNTS_ALERT_ICON
 from app.db.database import db
 
+st.page_link(
+    st.Page(PAGE_PATH.MANAGE_ACCOUNTS, title="Manage Accounts"),
+    label="Back to Accounts",
+    icon=":material/arrow_back:"
+)
+
 selected = st.session_state.get(ACCOUNT_SELECTED_ACCOUNT)
 account = BankAccount.model_validate(selected.model_dump())
 # account = BankAccount.model_validate(db.BankAccounts.head(3).to_dict(orient="records")[2])
