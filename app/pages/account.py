@@ -16,9 +16,11 @@ st.page_link(
 )
 
 selected = st.session_state.get(ACCOUNT_SELECTED_ACCOUNT)
+
+if selected is None:
+    st.switch_page(st.Page(PAGE_PATH.MANAGE_ACCOUNTS))
+
 account = BankAccount.model_validate(selected.model_dump())
-# account = BankAccount.model_validate(db.BankAccounts.head(3).to_dict(orient="records")[2])
-# st.session_state[ACCOUNT_SELECTED_ACCOUNT] = account
 
 if not account:
     error_msg = "Could not reach account details"
