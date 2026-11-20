@@ -3,14 +3,15 @@ import plotly.express as px
 import streamlit as st
 
 from app.components.category_details_grid import category_details_grid
+from app.components.stat_container import stat_container
 from app.data.models import Category
 from app.data.page_paths import PAGE_PATH
 from app.data.streamlit_state_keys import CATEGORY_SELECTED_CATEGORY, CATEGORIES_ALERT_ICON, CATEGORIES_ALERT_MSG
 from app.db.database import db
 
-# category = Category.model_validate(st.session_state.get(CATEGORY_SELECTED_CATEGORY))
-category = Category.model_validate(db.Categories.head(1).to_dict(orient="records")[0])
-st.session_state[CATEGORY_SELECTED_CATEGORY] = category
+category = Category.model_validate(st.session_state.get(CATEGORY_SELECTED_CATEGORY))
+# category = Category.model_validate(db.Categories.head(1).to_dict(orient="records")[0])
+# st.session_state[CATEGORY_SELECTED_CATEGORY] = category
 
 if not category:
     error_msg = "Could not reach category details"
@@ -62,31 +63,13 @@ df = db.Transactions[db.Transactions["category_id"] == str(category.id)].reset_i
 total_spend = df[(df["type"] == "expense")]["amount"].sum()
 total_income = df[(df["type"] == "income")]["amount"].sum()
 
-with col1:
-    with st.container(border=True, horizontal_alignment="center"):
-        st.markdown(f"**Total spend**", text_alignment="center")
-        st.text(f"{total_spend:.2f}")
-
-with col2:
-    with st.container(border=True, horizontal_alignment="center"):
-        st.markdown(f"**Total income**", text_alignment="center")
-        st.text(f"{total_income:.2f}")
+stat_container(col1, f"**Total spend**", f"{total_spend:.2f}")
+stat_container(col2, f"**Total income**", f"{total_income:.2f}")
 
 # number of transactions
 total_transactions = df.shape[0]
 
-with col3:
-    with st.container(border=True, horizontal_alignment="center"):
-        st.markdown(f"**Total transactions**", text_alignment="center")
-        st.text(f"{total_transactions}")
-
-# avg_transaction_amount = df["amount"].median()
-#
-# with col4:
-#     with st.container(border=True, horizontal_alignment="center"):
-#         st.markdown(f"**Avg amount**", text_alignment="center")
-#         st.text(f"{avg_transaction_amount:.2f}", )
-
+stat_container(col3, f"**Total transactions**", f"{total_transactions}")
 
 # percentage of overall expenses
 overall = (db.Transactions[(db.Transactions["type"] == "expense")]
@@ -98,10 +81,7 @@ overall = (db.Transactions[(db.Transactions["type"] == "expense")]
 overall["percentage"] = overall["amount"] / overall["amount"].sum() * 100
 overall_percentage = overall[overall["category_id"] == str(category.id)]["percentage"].values[0]
 
-with col4:
-    with st.container(border=True, horizontal_alignment="center"):
-        st.markdown(f"**Overall Spending**", text_alignment="center")
-        st.text(f"{overall_percentage:.2f}%", text_alignment="center")
+stat_container(col4, f"**Overall Spending**", f"{overall_percentage:.2f}%")
 
 # monthly spending line chart
 df["date"] = pd.to_datetime(df["date"])
@@ -148,4 +128,5 @@ with st.container(border=True, horizontal_alignment="center"):
 
 # history
 df = df.drop(columns=["id", "category_id"])
+st.divider()
 st.dataframe(df, hide_index=True)
