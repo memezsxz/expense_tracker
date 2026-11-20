@@ -2,7 +2,7 @@ import pandas as pd
 import plotly.express as px
 import streamlit as st
 
-from app.components.category_details_grid import details_grid
+from app.components.category_details_grid import category_details_grid
 from app.data.models import Category
 from app.data.page_paths import PAGE_PATH
 from app.data.streamlit_state_keys import CATEGORY_SELECTED_CATEGORY, CATEGORIES_ALERT_ICON, CATEGORIES_ALERT_MSG
@@ -46,7 +46,7 @@ with st.container(
 
 st.divider()
 
-details_grid(category)
+category_details_grid(category)
 
 st.divider()
 

@@ -29,7 +29,7 @@ def add_account_btn():
 
 bank_accounts: list[BankAccount] = [
     BankAccount.model_validate(row)
-    for row in db.BankAccount.to_dict(orient="records")
+    for row in db.BankAccounts.to_dict(orient="records")
 ]
 
 # TODO: add paging
