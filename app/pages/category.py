@@ -15,6 +15,12 @@ category = Category.model_validate(selected.model_dump())
 # category = Category.model_validate(db.Categories.head(1).to_dict(orient="records")[0])
 # st.session_state[CATEGORY_SELECTED_CATEGORY] = category
 
+st.page_link(
+    st.Page(PAGE_PATH.MANAGE_CATEGORIES, title="Manage Categories"),
+    label="Back to Categories",
+    icon=":material/arrow_back:"
+)
+
 if not category:
     error_msg = "Could not reach category details"
     st.session_state[CATEGORIES_ALERT_MSG] = f":red[{error_msg}]"
