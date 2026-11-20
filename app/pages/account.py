@@ -175,5 +175,5 @@ df = (db.Transactions[(db.Transactions["account_id"] == str(account.id))]
       .rename(columns={"name": "category"})
       )
 
-st.divider()
+st.subheader("Overview", divider="gray", anchor=False)
 st.dataframe(df, hide_index=True)
