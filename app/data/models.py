@@ -32,6 +32,7 @@ class BankAccount(BaseModel):
     color: BadgeColor = Field(default="blue")
     icon: str = Field()
     currency: Currency = Field(default=Currency.BHD)
+    monthly_limit: float = Field(ge=0, default=0.0)
     date_created: dt.date = Field(default_factory=dt.date.today)
 
 

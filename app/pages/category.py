@@ -10,6 +10,10 @@ from app.data.streamlit_state_keys import CATEGORY_SELECTED_CATEGORY, CATEGORIES
 from app.db.database import db
 
 selected = st.session_state.get(CATEGORY_SELECTED_CATEGORY)
+
+if selected is None:
+    st.switch_page(st.Page(PAGE_PATH.MANAGE_CATEGORIES))
+
 category = Category.model_validate(selected.model_dump())
 
 # category = Category.model_validate(db.Categories.head(1).to_dict(orient="records")[0])

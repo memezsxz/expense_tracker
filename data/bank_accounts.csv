@@ -1,5 +1,5 @@
-id,name,balance,color,icon,currency,date_created
-9d736485-dde4-4e1f-8053-6e1001b00208,Defaultfwssdaf,3053.715000000001,yellow,:material/savings:,BHD,2026-11-20
-e3116b43-ea2a-4705-9fff-aedb8b3e4f1a,Default,1865.8610000000006,red,:material/local_offer:,BHD,2026-11-20
-aed7454a-7eec-5017-96f6-31f040b2f457,Cash Wallet,702.3349999999996,green,:material/account_balance_wallet:,BHD,2026-11-20
-c6561500-5e5b-55f4-a9b0-5e09fca43a2b,Emergency Savings,0.0,blue,:material/savings:,BHD,2026-11-20
+id,name,balance,color,icon,currency,date_created,monthly_limit
+9d736485-dde4-4e1f-8053-6e1001b00208,Defaultfwssdaf,3052.715000000001,yellow,:material/savings:,BHD,2026-11-20,1000.0
+e3116b43-ea2a-4705-9fff-aedb8b3e4f1a,Default,1865.8610000000006,red,:material/local_offer:,BHD,2026-11-20,100000.0
+aed7454a-7eec-5017-96f6-31f040b2f457,Cash Wallet,702.3349999999996,green,:material/account_balance_wallet:,BHD,2026-11-20,0.0
+c6561500-5e5b-55f4-a9b0-5e09fca43a2b,Emergency Savings,0.0,blue,:material/savings:,BHD,2026-11-20,0.0
