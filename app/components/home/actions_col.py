@@ -1,6 +1,3 @@
-import contextlib
-from typing import Any, Generator
-
 import streamlit as st
 
 from app.components.alert import show_alert
@@ -26,12 +23,6 @@ def _check_can_add_transaction():
     return True
 
 
-@st.dialog(
-    title="Create Transaction", width="medium", position="center", )
-def _create_transaction_dialog(transaction: Transaction):
-    transactions_details_grid(transaction)
-
-
 def _open_create_transaction_dialog(selected_bank_account: BankAccount, type: TransactionType):
     default_category = Category.model_validate(db.Categories.iloc[0].to_dict())
 
@@ -47,11 +38,19 @@ def _open_create_transaction_dialog(selected_bank_account: BankAccount, type: Tr
 
     st.session_state[TRANSACTIONS_SELECTED_TRANSACTION] = transaction
 
-    _create_transaction_dialog(transaction)
+    @st.dialog(
+        title=f"Create {transaction.type.value.title()}",
+        width="medium",
+        position="center",
+    )
+    def dialog():
+        transactions_details_grid(transaction)
+
+    dialog()
 
 
 def actions_col(bank_accounts: list[BankAccount]) -> BankAccount:
-    col1, col2, col3, col4, col5 = st.columns([4, 3, 0.7, 0.7 ,0.7])
+    col1, col2, col3, col4, col5 = st.columns([4, 3, 0.7, 0.7, 0.7])
 
     with col1:
         st.text_input(
