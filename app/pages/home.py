@@ -75,7 +75,7 @@ for t in transactions:
 
 for day in sorted(days, reverse=True):
     st.divider()
-    st.markdown("##### " + day.strftime("%A, %d %B"))
+    st.markdown("##### " + day.strftime("%A, %d %B"), anchors=False)
 
     for t in days[day]:
         transaction_expandable(t)
