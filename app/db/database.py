@@ -84,22 +84,33 @@ class Database:
         setattr(db, table_name, df)
         db._save_df(df)
 
-    def get_transactions_by_account(self, account_id: UUID) -> list[TransactionView]:
+    def get_transactions_by_account_and_month(
+            self,
+            account_id: UUID,
+            year: int,
+            month: int
+    ) -> list[TransactionView]:
         df = db.Transactions
 
         if df.empty:
             return []
 
-        filtered = df[df["account_id"] == str(account_id)]
+        dates = pd.to_datetime(df["created_at"])
+
+        filtered = df[
+            (df["account_id"] == str(account_id))
+            & (dates.dt.year == year)
+            & (dates.dt.month == month)
+            ]
 
         categories = {
             c.id: c
-            for c in self.Categories()
+            for c in self.Categories
         }
 
         accounts = {
             a.id: a
-            for a in self.BankAccount()
+            for a in self.BankAccounts
         }
 
         return [

@@ -1,10 +1,9 @@
 import datetime as dt
 from enum import Enum
-from typing import Annotated
 from uuid import UUID, uuid4
 
 from iso4217 import Currency
-from pydantic import BaseModel, Field, StringConstraints
+from pydantic import BaseModel, Field
 
 from app.data.colors import BadgeColor
 
@@ -53,15 +52,17 @@ class Transaction(BaseModel):
     account_id: UUID = Field()
     category_id: UUID = Field()
     amount: float = Field(gt=0)
-    date: dt.date = Field(default_factory=dt.date.today)
+    created_at: dt.date = Field(default_factory=dt.date.today)
     type: TransactionType
     notes: str = Field(default="")
     attachments: list[Attachment] = Field(default=[])  # ids for images
+
 
 class TransactionView(BaseModel):
     transaction: Transaction
     category: Category | None = None
     account: BankAccount | None = None
+
 
 class Attachment(BaseModel):
     id: UUID = Field(default_factory=uuid4)

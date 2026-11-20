@@ -1,7 +1,8 @@
+import datetime
+
 import streamlit as st
 
 from app.components.alert import show_alert
-from app.data.mock_data import mock_bank_accounts
 from app.data.models import Transaction, TransactionView, BankAccount
 from app.data.streamlit_state_keys import HOME_ALERT_MSG, HOME_ALERT_ICON
 from app.db.database import db
@@ -16,6 +17,7 @@ bank_accounts: list[BankAccount] = [
     for row in db.BankAccounts.to_dict(orient="records")
 ]
 
+date = datetime.datetime.now()
 
 col1, col2, col3 = st.columns([6, 3.5, 1.5])
 
@@ -53,7 +55,7 @@ if db.Transactions.empty:
 
 print(db.Transactions.columns)
 
-transactions: list[TransactionView] = db.get_transactions_by_account(selected_bank_account.id)
+transactions: list[TransactionView] = db.get_transactions_by_account(selected_bank_account.id, date.year, date.month)
 
 #     [
 #     Transaction.model_validate(row)
@@ -77,18 +79,18 @@ for t in transactions:
             st.write("icon")
 
         with col2:
-            st.write(t.title)
+            st.write(t.transaction.title)
 
         with col3:
             # TODO: change color based on t type and add negative for expense
-            st.write(t.amount)
+            st.write(t.transaction.amount)
             # TODO: add currency
 
         with col4:
             st.button("",
                       type="tertiary",
                       icon=":material/manage_search:",
-                      key=f"view_btn_{t.id}",
+                      key=f"view_btn_{t.transaction.id}",
                       on_click=view_transaction,
                       args=(t,),
                       )
