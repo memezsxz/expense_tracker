@@ -95,8 +95,9 @@ class Database:
         if df.empty:
             return []
 
-        dates = pd.to_datetime(df["created_at"])
+        dates = pd.to_datetime(df["date"])
 
+        # TODO: add merge with subtypes if possible
         filtered = df[
             (df["account_id"] == str(account_id))
             & (dates.dt.year == year)
@@ -105,12 +106,18 @@ class Database:
 
         categories = {
             c.id: c
-            for c in self.Categories
+            for c in [
+                Category.model_validate(row)
+                for row in self.Categories.to_dict(orient="records")
+            ]
         }
 
         accounts = {
             a.id: a
-            for a in self.BankAccounts
+            for a in [
+                BankAccount.model_validate(row)
+                for row in self.BankAccounts.to_dict(orient="records")
+            ]
         }
 
         return [

@@ -2,8 +2,9 @@ import datetime as dt
 from enum import Enum
 from uuid import UUID, uuid4
 
+import pandas as pd
 from iso4217 import Currency
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, field_validator
 
 from app.data.colors import BadgeColor
 
@@ -52,10 +53,15 @@ class Transaction(BaseModel):
     account_id: UUID = Field()
     category_id: UUID = Field()
     amount: float = Field(gt=0)
-    created_at: dt.date = Field(default_factory=dt.date.today)
+    date: dt.date = Field(default_factory=dt.date.today)
     type: TransactionType
-    notes: str = Field(default="")
-    attachments: list[Attachment] = Field(default=[])  # ids for images
+    notes: str = ""
+    # attachments: list[Attachment] = Field(default=[])  # ids for images
+
+    @field_validator("notes", mode="before")
+    @classmethod
+    def handle_empty_notes(cls, value):
+        return "" if pd.isna(value) else value
 
 
 class TransactionView(BaseModel):

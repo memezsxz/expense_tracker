@@ -3,12 +3,48 @@ import datetime
 import streamlit as st
 
 from app.components.alert import show_alert
-from app.data.models import Transaction, TransactionView, BankAccount
-from app.data.streamlit_state_keys import HOME_ALERT_MSG, HOME_ALERT_ICON
+from app.components.transaction_details_grid import transactions_details_grid
+from app.data.models import Transaction, TransactionView, BankAccount, TransactionType, Category
+from app.data.streamlit_state_keys import HOME_ALERT_MSG, HOME_ALERT_ICON, TRANSACTIONS_SELECTED_TRANSACTION
 from app.db.database import db
 
 
-def view_transaction(to_view_transaction: Transaction):
+def check_can_add_transaction():
+    if db.BankAccounts.empty:
+        st.session_state[HOME_ALERT_MSG] = ":red[You have no accounts, create some!]"
+        st.session_state[HOME_ALERT_ICON] = "🚨"
+        show_alert(HOME_ALERT_MSG, HOME_ALERT_ICON)
+        return False
+
+    elif db.Categories.empty:
+        st.session_state[HOME_ALERT_MSG] = ":red[You have no categories, create some!]"
+        st.session_state[HOME_ALERT_ICON] = "🚨"
+        show_alert(HOME_ALERT_MSG, HOME_ALERT_ICON)
+        return False
+
+    return True
+
+
+@st.dialog(
+    title="Create Transaction", width="medium", position="center", )
+def create_transaction_dialog():
+    default_category = Category.model_validate(db.Categories.iloc[0].to_dict())
+
+    transaction = Transaction(
+        title=default_category.name,
+        amount=1,
+        type=TransactionType.EXPENSE,
+        category_id=default_category.id,
+        account_id=selected_bank_account.id
+    )
+
+    db.save(transaction, op="add")
+
+    st.session_state[TRANSACTIONS_SELECTED_TRANSACTION] = transaction
+    transactions_details_grid(transaction)
+
+
+def view_transaction(transaction: TransactionView):
     pass
 
 
@@ -26,7 +62,7 @@ with col1:
     # TODO: add on change do search
 
 with col2:
-    selected_bank_account = st.selectbox(
+    selected_bank_account : BankAccount = st.selectbox(
         "Select a bank account",
         options=bank_accounts,
         format_func=lambda acc: acc.name,
@@ -34,7 +70,8 @@ with col2:
     )
 
 with col3:
-    add_btn = st.button(label="Add", icon=":material/add:", width="stretch")
+    if st.button(label="Add", icon=":material/add:", width="stretch", ) and check_can_add_transaction():
+        create_transaction_dialog()
 
 st.space(size="small")
 
@@ -53,9 +90,9 @@ if db.Transactions.empty:
                     text_alignment="center")
         st.stop()
 
-print(db.Transactions.columns)
-
-transactions: list[TransactionView] = db.get_transactions_by_account(selected_bank_account.id, date.year, date.month)
+transactions: list[TransactionView] = db.get_transactions_by_account_and_month(selected_bank_account.id,
+                                                                               date.year,
+                                                                               date.month)
 
 #     [
 #     Transaction.model_validate(row)

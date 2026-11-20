@@ -19,7 +19,7 @@ def update_category(field: str, widget_key: str):
     db.save(copy, op="edit")
 
 
-def details_grid(category: Category):
+def category_details_grid(category: Category):
     category = st.session_state[CATEGORY_SELECTED_CATEGORY]
     grid = st.grid(2, vertical_alignment="center")
 
