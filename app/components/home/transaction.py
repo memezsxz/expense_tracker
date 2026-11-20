@@ -1,7 +1,7 @@
 import streamlit as st
 
 from app.components.transaction_details_grid import transactions_details_grid
-from app.data.models import TransactionView, TransactionType
+from app.data.models import TransactionView, TransactionType, Transaction
 from app.data.streamlit_state_keys import TRANSACTIONS_SELECTED_TRANSACTION
 from app.db.database import db
 
@@ -38,6 +38,7 @@ def view_transaction(view: TransactionView):
                 width="stretch",
             ):
                 db.save(transaction, op="delete")
+                db.update_account_balance(transaction.account_id)
                 st.session_state.pop(TRANSACTIONS_SELECTED_TRANSACTION, None)
                 st.rerun()
 
@@ -75,7 +76,7 @@ def transaction_expandable(transaction_view: TransactionView):  # TODO: change t
                 f":{color}[{sign}{transaction_view.transaction.amount:,.{currency.exponent}f} {currency.code}]"
             )
 
-        with col4:  # TODO: make it an edit button and dialog should show delete button
+        with col4:
             st.button("",
                       type="tertiary",
                       icon=":material/manage_search:",

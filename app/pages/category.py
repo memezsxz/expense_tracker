@@ -9,7 +9,9 @@ from app.data.page_paths import PAGE_PATH
 from app.data.streamlit_state_keys import CATEGORY_SELECTED_CATEGORY, CATEGORIES_ALERT_ICON, CATEGORIES_ALERT_MSG
 from app.db.database import db
 
-category = Category.model_validate(st.session_state.get(CATEGORY_SELECTED_CATEGORY))
+selected = st.session_state.get(CATEGORY_SELECTED_CATEGORY)
+category = Category.model_validate(selected.model_dump())
+
 # category = Category.model_validate(db.Categories.head(1).to_dict(orient="records")[0])
 # st.session_state[CATEGORY_SELECTED_CATEGORY] = category
 
@@ -21,13 +23,18 @@ if not category:
 
 
 def delete_category(to_delete_category: Category):
+    category_id = str(to_delete_category.id)
+
+    if (db.Transactions["category_id"] == category_id).any():
+        st.error("Cannot delete a category that has transactions.")
+        return
+
     db.save(to_delete_category, "delete")
-    success_msg = "Category Deleted Successfully"
-    st.session_state[CATEGORIES_ALERT_MSG] = f":green[{success_msg}]"
+
+    st.session_state[CATEGORIES_ALERT_MSG] = ":green[Category Deleted Successfully]"
     st.session_state[CATEGORIES_ALERT_ICON] = "✅"
 
     st.switch_page(st.Page(PAGE_PATH.MANAGE_CATEGORIES))
-
 
 with st.container(
         horizontal=True,

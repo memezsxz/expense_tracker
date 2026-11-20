@@ -15,9 +15,20 @@ def update_transaction(field: str, widget_key: str):
         update={field: st.session_state[widget_key]}
     )
 
-    st.session_state[TRANSACTIONS_SELECTED_TRANSACTION] = copy
     db.save(copy, op="edit")
 
+    account_ids = {
+        current.account_id,
+        current.to_account_id,
+        copy.account_id,
+        copy.to_account_id
+    }
+
+    for account_id in account_ids:
+        if account_id is not None:
+            db.update_account_balance(account_id)
+
+    st.session_state[TRANSACTIONS_SELECTED_TRANSACTION] = copy
 
 def transactions_details_grid(
         transaction: Transaction,
