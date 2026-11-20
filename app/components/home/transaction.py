@@ -1,10 +1,47 @@
 import streamlit as st
 
-from app.data.models import Transaction, TransactionView, TransactionType
+from app.components.transaction_details_grid import transactions_details_grid
+from app.data.models import TransactionView, TransactionType
+from app.data.streamlit_state_keys import TRANSACTIONS_SELECTED_TRANSACTION
+from app.db.database import db
 
 
-def view_transaction(transaction: TransactionView):
-    pass
+def view_transaction(view: TransactionView):
+    st.session_state[TRANSACTIONS_SELECTED_TRANSACTION] = view.transaction
+
+    @st.dialog(
+        title=f"Edit {view.transaction.type.value.title()}",
+        width="medium",
+        on_dismiss="rerun",
+    )
+    def edit_dialog():
+        transaction = st.session_state[TRANSACTIONS_SELECTED_TRANSACTION]
+
+        transactions_details_grid(transaction)
+
+        st.divider()
+
+        col1, col2 = st.columns(2, vertical_alignment="bottom")
+
+        with col1:
+            confirm_delete = st.checkbox(
+                "Confirm deletion",
+                key=f"confirm_delete_{transaction.id}",
+            )
+
+        with col2:
+            if st.button(
+                "Delete",
+                icon=":material/delete:",
+                type="primary",
+                disabled=not confirm_delete,
+                width="stretch",
+            ):
+                db.save(transaction, op="delete")
+                st.session_state.pop(TRANSACTIONS_SELECTED_TRANSACTION, None)
+                st.rerun()
+
+    edit_dialog()
 
 def transaction_expandable(transaction_view: TransactionView):  # TODO: change to an expandable
     t_con = st.container(border=True)
@@ -32,7 +69,7 @@ def transaction_expandable(transaction_view: TransactionView):  # TODO: change t
                 f":{color}[{sign}{transaction_view.transaction.amount:,.{currency.exponent}f} {currency.code}]"
             )
 
-        with col4: # TODO: make it an edit button and dialog should show delete button
+        with col4:  # TODO: make it an edit button and dialog should show delete button
             st.button("",
                       type="tertiary",
                       icon=":material/manage_search:",
