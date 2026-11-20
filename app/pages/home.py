@@ -3,80 +3,28 @@ import datetime
 import streamlit as st
 
 from app.components.alert import show_alert
-from app.components.transaction_details_grid import transactions_details_grid
-from app.data.models import Transaction, TransactionView, BankAccount, TransactionType, Category
-from app.data.streamlit_state_keys import HOME_ALERT_MSG, HOME_ALERT_ICON, TRANSACTIONS_SELECTED_TRANSACTION
+from app.components.home.actions_col import actions_col
+from app.components.home.date_cols import change_month_col
+from app.components.home.transaction import transaction_expandable
+from app.data.models import TransactionView, BankAccount
+from app.data.streamlit_state_keys import HOME_ALERT_MSG, HOME_ALERT_ICON, HOME_SELECTED_MONTH
 from app.db.database import db
 
+date = datetime.datetime.now()
 
-def check_can_add_transaction():
-    if db.BankAccounts.empty:
-        st.session_state[HOME_ALERT_MSG] = ":red[You have no accounts, create some!]"
-        st.session_state[HOME_ALERT_ICON] = "🚨"
-        show_alert(HOME_ALERT_MSG, HOME_ALERT_ICON)
-        return False
-
-    elif db.Categories.empty:
-        st.session_state[HOME_ALERT_MSG] = ":red[You have no categories, create some!]"
-        st.session_state[HOME_ALERT_ICON] = "🚨"
-        show_alert(HOME_ALERT_MSG, HOME_ALERT_ICON)
-        return False
-
-    return True
-
-def open_create_transaction_dialog():
-    default_category = Category.model_validate(db.Categories.iloc[0].to_dict())
-
-    transaction = Transaction(
-        title=default_category.name,
-        amount=1,
-        type=TransactionType.EXPENSE,
-        category_id=default_category.id,
-        account_id=selected_bank_account.id
-    )
-
-    db.save(transaction, op="add")
-
-    st.session_state[TRANSACTIONS_SELECTED_TRANSACTION] = transaction
-
-    create_transaction_dialog(transaction)
-
-@st.dialog(
-    title="Create Transaction", width="medium", position="center", )
-def create_transaction_dialog(transaction: Transaction):
-    transactions_details_grid(transaction)
-
-
-def view_transaction(transaction: TransactionView):
-    pass
-
+if HOME_SELECTED_MONTH not in st.session_state:
+    st.session_state[HOME_SELECTED_MONTH] = date.today().replace(day=1)
 
 bank_accounts: list[BankAccount] = [
     BankAccount.model_validate(row)
     for row in db.BankAccounts.to_dict(orient="records")
 ]
 
-date = datetime.datetime.now()
+selected_bank_account = actions_col(bank_accounts)
 
-col1, col2, col3 = st.columns([6, 3.5, 1.5])
+search = st.session_state.get("home_search", "").strip()
 
-with col1:
-    search = st.text_input(label="collapsed", label_visibility="collapsed", placeholder="Search")
-    # TODO: add on change do search
-
-with col2:
-    selected_bank_account : BankAccount = st.selectbox(
-        "Select a bank account",
-        options=bank_accounts,
-        format_func=lambda acc: acc.name,
-        label_visibility="collapsed",
-    )
-
-with col3:
-    if st.button(label="Add", icon=":material/add:", width="stretch", ) and check_can_add_transaction():
-        open_create_transaction_dialog()
-
-st.space(size="small")
+selected_month = change_month_col()
 
 if len(bank_accounts) == 0:
     with st.container(vertical_alignment="center"):
@@ -93,46 +41,28 @@ if db.Transactions.empty:
                     text_alignment="center")
         st.stop()
 
-transactions: list[TransactionView] = db.get_transactions_by_account_and_month(selected_bank_account.id,
-                                                                               date.year,
-                                                                               date.month)
+transactions: list[TransactionView] = (
+    db.get_transactions_by_account_and_month(
+        selected_bank_account.id,
+        selected_month.year,
+        selected_month.month,
+    )
+)
 
-#     [
-#     Transaction.model_validate(row)
-#     for row in db.Transactions[db.Transactions["account_id"] == selected_bank_account.id].to_dict(orient="records")
-# ]
+st.divider()
+# st.space(size="small")
 
-# transactions = mock_transactions
-
-if len(transactions) == 0:
-    with st.container(vertical_alignment="center"):
-        st.space(size="large")
-        st.markdown(":gray[You have no transactions, create some!]", text_alignment="center")
+if search:
+    transactions = [
+        t for t in transactions
+        if search.casefold() in t.transaction.title.casefold()
+           or (
+                   t.category is not None
+                   and search.casefold() in t.category.name.casefold()
+           )
+    ]
 
 for t in transactions:
-    acc_con = st.container(border=True)
-    with acc_con:  # click on to view Account page
-        col1, col2, col3, col4 = st.columns([0.8, 8, 1, 0.5], vertical_alignment="center")
-
-        with col1:
-            # st.badge(label="", icon=t.icon, color=account.color)
-            st.write("icon")
-
-        with col2:
-            st.write(t.transaction.title)
-
-        with col3:
-            # TODO: change color based on t type and add negative for expense
-            st.write(t.transaction.amount)
-            # TODO: add currency
-
-        with col4:
-            st.button("",
-                      type="tertiary",
-                      icon=":material/manage_search:",
-                      key=f"view_btn_{t.transaction.id}",
-                      on_click=view_transaction,
-                      args=(t,),
-                      )
+    transaction_expandable(t)
 
 show_alert(HOME_ALERT_MSG, HOME_ALERT_ICON)
