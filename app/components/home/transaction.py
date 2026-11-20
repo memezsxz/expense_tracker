@@ -49,7 +49,13 @@ def transaction_expandable(transaction_view: TransactionView):  # TODO: change t
         col1, col2, col3, col4 = st.columns([0.8, 7.5, 1.5, 0.5], vertical_alignment="center")
 
         with col1:
-            st.badge(label="", icon=transaction_view.category.icon, color=transaction_view.category.color)
+            category = transaction_view.category
+
+            st.badge(
+                label="",
+                icon=category.icon if category else ":material/swap_horiz:",
+                color=category.color if category else "blue",
+            )
 
         with col2:
             st.write(transaction_view.transaction.title)

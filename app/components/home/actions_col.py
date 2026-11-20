@@ -22,16 +22,52 @@ def _check_can_add_transaction():
 
     return True
 
+def _open_create_transaction_dialog(
+    selected_bank_account: BankAccount,
+    type: TransactionType
+):
+    category_id = None
+    to_account_id = None
+    title = "Transfer"
 
-def _open_create_transaction_dialog(selected_bank_account: BankAccount, type: TransactionType):
-    default_category = Category.model_validate(db.Categories.iloc[0].to_dict())
+    if type == TransactionType.TRANSFER:
+        accounts = [
+            BankAccount.model_validate(row)
+            for row in db.BankAccounts.to_dict("records")
+        ]
+
+        other_account = next(
+            (
+                a for a in accounts
+                if a.id != selected_bank_account.id
+                and a.currency == selected_bank_account.currency
+            ),
+            None
+        )
+
+        if other_account is None:
+            st.session_state[HOME_ALERT_MSG] = ":red[You have no other account with the same currency!]"
+            st.session_state[HOME_ALERT_ICON] = ""
+            show_alert(HOME_ALERT_MSG, HOME_ALERT_ICON)
+            return
+
+        to_account_id = other_account.id
+
+    else:
+        default_category = Category.model_validate(
+            db.Categories.iloc[0].to_dict()
+        )
+
+        category_id = default_category.id
+        title = default_category.name
 
     transaction = Transaction(
-        title=default_category.name,
+        title=title,
         amount=1,
         type=type,
-        category_id=default_category.id,
-        account_id=selected_bank_account.id
+        category_id=category_id,
+        account_id=selected_bank_account.id,
+        to_account_id=to_account_id,
     )
 
     db.save(transaction, op="add")
@@ -61,11 +97,12 @@ def actions_col(bank_accounts: list[BankAccount]) -> BankAccount:
         )
 
     with col2:
-        selected_bank_account: BankAccount = st.selectbox(
+        selected_bank_account = st.selectbox(
             "Select a bank account",
             options=bank_accounts,
-            format_func=lambda acc: acc.name,
+            format_func=lambda acc: f"{acc.name} ({str(acc.id)[:6]})",
             label_visibility="collapsed",
+            key="home_select_account",
         )
 
     with col3:

@@ -1,13 +1,10 @@
-from typing import get_args
+import datetime
 from uuid import UUID
 
 import streamlit as st
-from iso4217 import Currency
 
-from app.data.colors import BadgeColor, color_emojis
-from app.data.icons import icon_options
-from app.data.models import BankAccount, TransactionView, Transaction, Category
-from app.data.streamlit_state_keys import ACCOUNT_SELECTED_ACCOUNT, TRANSACTIONS_SELECTED_TRANSACTION
+from app.data.models import BankAccount, Transaction, TransactionType
+from app.data.streamlit_state_keys import TRANSACTIONS_SELECTED_TRANSACTION
 from app.db.database import db
 
 
@@ -23,7 +20,7 @@ def update_transaction(field: str, widget_key: str):
 
 
 def transactions_details_grid(
-    transaction: Transaction,
+        transaction: Transaction,
 ):
     transaction = st.session_state[TRANSACTIONS_SELECTED_TRANSACTION]
 
@@ -93,6 +90,40 @@ def transactions_details_grid(
                 label_visibility="collapsed",
             )
 
+    def to_account_in():
+        grid.write("To Account")
+
+        with grid.cell():
+            accounts = [
+                BankAccount.model_validate(row)
+                for row in db.BankAccounts.to_dict("records")
+            ]
+
+            accounts = [
+                a for a in accounts
+                if a.id != transaction.account_id
+            ]
+
+            account_ids = [a.id for a in accounts]
+            account_names = {a.id: a.name for a in accounts}
+
+            key = f"to_account_{transaction.id}"
+
+            st.selectbox(
+                "To Account",
+                options=account_ids,
+                format_func=lambda id: account_names[id],
+                index=(
+                    account_ids.index(transaction.to_account_id)
+                    if transaction.to_account_id in account_ids
+                    else None
+                ),
+                label_visibility="collapsed",
+                key=key,
+                on_change=update_transaction,
+                args=("to_account_id", key),
+            )
+
     def date_in():
         grid.write("Date")
         key = f"date_{transaction.id}"
@@ -101,6 +132,7 @@ def transactions_details_grid(
             label="Date",
             label_visibility="collapsed",
             value=transaction.date,
+            max_value=datetime.date.today(),
             key=key,
             on_change=update_transaction,
             args=("date", key),
@@ -119,9 +151,13 @@ def transactions_details_grid(
             args=("notes", key),
         )
 
-
     title_in()
     amount_in()
-    category_in()
+
+    if transaction.type == TransactionType.TRANSFER:
+        to_account_in()
+    else:
+        category_in()
+
     date_in()
     note_in()
