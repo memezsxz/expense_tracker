@@ -35,5 +35,13 @@
 
 Make personal finance tracking simple, organized, and accessible through an intuitive interface.
 
+## Run Instructions 
+
+To run the project use
+
+```bash
+uv run python -m streamlit run app/streamlit_app.py
+```
+
 ## Note
 Mock data was generated using gen AI tools
