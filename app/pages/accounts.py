@@ -55,7 +55,6 @@ st.space(size="small")
 if len(bank_accounts) == 0:
     show_missing_and_stop("You have no accounts, create some!]")
 
-
 for account in bank_accounts:
     acc_con = st.container(border=True)
     with acc_con:  # click on to view Account page

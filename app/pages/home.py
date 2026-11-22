@@ -1,6 +1,6 @@
 import datetime
 from collections import defaultdict
-import pandas as pd
+
 import streamlit as st
 
 from app.components.alert import show_alert
@@ -11,6 +11,7 @@ from app.components.show_missing import show_missing_and_stop
 from app.data.models import TransactionView, BankAccount
 from app.data.streamlit_state_keys import HOME_ALERT_MSG, HOME_ALERT_ICON, HOME_SELECTED_MONTH
 from app.db.database import db
+from app.utils.home_utils import get_monthly_spending
 
 date = datetime.datetime.now()
 
@@ -24,7 +25,6 @@ bank_accounts: list[BankAccount] = [
 
 selected_bank_account, selected_category = actions_col(bank_accounts)
 
-
 if len(bank_accounts) == 0:
     show_missing_and_stop("You have no bank accounts, create some to add transactions!")
 
@@ -35,15 +35,7 @@ search = st.session_state.get("home_search", "").strip()
 
 selected_month = change_month_col()
 
-df = db.Transactions
-df["date"] = pd.to_datetime(df["date"])
-
-monthly_spending = df[
-    (df["account_id"] == str(selected_bank_account.id)) &
-    (df["type"] == "expense") &
-    (df["date"].dt.year == selected_month.year) &
-    (df["date"].dt.month == selected_month.month)
-]["amount"].sum()
+monthly_spending = get_monthly_spending(selected_bank_account, selected_month)
 
 budget = selected_bank_account.monthly_limit
 
@@ -52,7 +44,6 @@ if budget > 0:
         st.error("You have exceeded your monthly limit!")
     elif monthly_spending >= budget * 0.9:
         st.warning("You have used 90% or more of your monthly limit!")
-
 
 if db.Transactions.empty:
     show_missing_and_stop("You have no transactions, create some!")
@@ -83,10 +74,8 @@ if search:
            )
     ]
 
-
 if not transactions:
     show_missing_and_stop("No transactions found for {selected_month:%B} of {selected_month.year}]")
-
 
 days = defaultdict(list)
 

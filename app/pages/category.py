@@ -46,6 +46,8 @@ def delete_category(to_delete_category: Category):
     st.session_state[CATEGORIES_ALERT_ICON] = "✅"
 
     st.switch_page(st.Page(PAGE_PATH.MANAGE_CATEGORIES))
+
+
 with st.container(
         horizontal=True,
         horizontal_alignment="distribute",
