@@ -36,6 +36,7 @@ st.set_page_config(
     initial_sidebar_state="expanded",
 )
 
+# assisted by CHAT-GPT
 st.html("""
 <style>
 .stAppHeader [data-testid="stTopNav"] {

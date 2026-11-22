@@ -78,7 +78,7 @@ for account in bank_accounts:
                       icon=":material/manage_search:",
                       key=f"view_btn_{account.id}",
                       on_click=view_account,
-                      args=(account,),
+                      args=(account,), # assisted by CHAT-GPT
                       )
 
 show_alert(ACCOUNTS_ALERT_MSG, ACCOUNTS_ALERT_ICON)
