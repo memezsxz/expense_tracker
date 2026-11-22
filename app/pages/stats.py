@@ -67,7 +67,7 @@ fig = px.bar(
         "Income": "green",
     },
     title="Monthly Income vs Expenses",
-    labels={
+    labels={ # assisted by CHAT-GPT
         "date": "Month",
         "amount": "Amount",
         "type": "Transaction Type",
@@ -86,7 +86,7 @@ fig = px.pie(
     title="Spending by Category",
 )
 
-fig.update_traces(textinfo="label+percent")
+fig.update_traces(textinfo="label+percent") # assisted by CHAT-GPT
 
 with st.container(border=True):
     st.plotly_chart(fig, width="stretch")

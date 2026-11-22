@@ -34,3 +34,6 @@
 ## 🎯 Goal
 
 Make personal finance tracking simple, organized, and accessible through an intuitive interface.
+
+## Note
+Mock data was generated using gen AI tools
