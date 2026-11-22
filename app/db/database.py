@@ -34,16 +34,21 @@ class Database:
     # _attachments_path = DATA_DIR / "attachments.csv"
 
     def __init__(self):
-        self.BankAccounts: pd.DataFrame = self._load_data(self._bank_accounts_path)
-        self.Categories: pd.DataFrame = self._load_data(self._categories_path)
-        self.Transactions: pd.DataFrame = self._load_data(self._transactions_path)
-        # self.Attachments: pd.DataFrame = self._load_data(self._attachments_path)
+        self.BankAccounts = self._load_data(
+            self._bank_accounts_path, BankAccount
+        )
+        self.Categories = self._load_data(
+            self._categories_path, Category
+        )
+        self.Transactions = self._load_data(
+            self._transactions_path, Transaction
+        )
 
-    def _load_data(self, path: Path) -> pd.DataFrame:
-        return (pd.read_csv(path)
-                if os.path.isfile(path)
-                else pd.DataFrame()
-                )
+    def _load_data(self, path: Path, model: type[BaseModel]) -> pd.DataFrame:
+        if path.is_file():
+            return pd.read_csv(path)
+
+        return pd.DataFrame(columns=model.model_fields.keys())
 
     def _save_df(self, df: pd.DataFrame):
         if df is self.BankAccounts:
