@@ -8,7 +8,11 @@ from app.db.database import db
 st.title("Financial Dashboard")
 
 if db.BankAccounts.empty or db.Transactions.empty:
-    st.info("Add accounts and transactions to see your statistics.")
+    with st.container(vertical_alignment="center"):
+        st.space(size="large")
+        st.markdown(":gray[Add accounts and transactions to see your statistics!]",
+                    text_alignment="center"
+                    )
     st.stop()
 
 currency = st.selectbox(
@@ -22,6 +26,16 @@ df = db.Transactions.merge(
     right_on="id",
 )
 df["date"] = pd.to_datetime(df["date"])
+
+df = df[df["currency"] == currency]
+
+if df.empty:
+    with st.container(vertical_alignment="center"):
+        st.space(size="large")
+        st.markdown(":gray[Add transactions to see your statistics for this currency!]",
+                    text_alignment="center"
+                    )
+    st.stop()
 
 st.subheader("Overview", divider="gray", anchor=False)
 
