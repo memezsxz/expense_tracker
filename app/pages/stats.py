@@ -1,9 +1,10 @@
-import pandas as pd
 import plotly.express as px
 import streamlit as st
 
+from app.components.show_missing import show_missing_and_stop
 from app.components.stat_container import stat_container
 from app.db.database import db
+from app.utils.stats_util import get_transactions_merge_account, get_top_stats, get_monthly_trends, get_category_totals
 
 st.title("Financial Dashboard")
 
@@ -20,40 +21,24 @@ currency = st.selectbox(
     options=sorted(db.BankAccounts["currency"].dropna().unique()),
 )
 
-df = db.Transactions.merge(
-    db.BankAccounts[["id", "currency"]],
-    left_on="account_id",
-    right_on="id",
-)
-df["date"] = pd.to_datetime(df["date"])
-
-df = df[df["currency"] == currency]
+df = get_transactions_merge_account(currency)
 
 if df.empty:
-    with st.container(vertical_alignment="center"):
-        st.space(size="large")
-        st.markdown(":gray[Add transactions to see your statistics for this currency!]",
-                    text_alignment="center"
-                    )
-    st.stop()
+    show_missing_and_stop("Add transactions to see your statistics for this currency!")
 
 st.subheader("Overview", divider="gray", anchor=False)
 
+(
+    expenses,
+    income,
+    total_expenses,
+    total_income,
+    daily_spend_avg,
+    net_cash_flow,
+    savings_rate
+) = get_top_stats(df)
 
-expenses = df[df["type"] == "expense"]
-income = df[df["type"] == "income"]
-
-total_expenses = expenses["amount"].sum()
-total_income = income["amount"].sum()
-net_cash_flow = total_income - total_expenses
-
-number_of_days = (df["date"].max() - df["date"].min()).days + 1
-daily_spend_avg = total_expenses / number_of_days
-
-savings_rate = (
-    net_cash_flow / total_income * 100
-    if total_income > 0 else None
-)
+st.subheader("Top Transactions", divider="gray", anchor=False)
 
 grid = st.grid(6, min_column_width=70, wrap=False)
 
@@ -70,26 +55,9 @@ stat_container(
 
 st.subheader("Monthly Trends", divider="gray", anchor=False)
 
-monthly_expenses = (
-    expenses.set_index("date")["amount"]
-    .resample("ME").sum()
-    .reset_index()
-)
-
-monthly_income = (
-    income.set_index("date")["amount"]
-    .resample("ME").sum()
-    .reset_index()
-)
-
-monthly_expenses["type"] = "Expense"
-monthly_income["type"] = "Income"
-
-combined = pd.concat([monthly_expenses, monthly_income])
-
-
+monthly_trends = get_monthly_trends(expenses, income)
 fig = px.bar(
-    combined,
+    monthly_trends,
     x="date",
     y="amount",
     color="type",
@@ -109,19 +77,7 @@ fig = px.bar(
 with st.container(border=True):
     st.plotly_chart(fig, width="stretch")
 
-
-category_totals = (
-    expenses.groupby("category_id")["amount"]
-    .sum()
-    .reset_index()
-)
-
-category_totals = category_totals.merge(
-    db.Categories,
-    left_on="category_id",
-    right_on="id"
-)
-
+category_totals = get_category_totals(expenses)
 fig = px.pie(
     category_totals,
     names="name",

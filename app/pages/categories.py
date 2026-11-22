@@ -1,6 +1,7 @@
 import streamlit as st
 
 from app.components.alert import show_alert
+from app.components.show_missing import show_missing_and_stop
 from app.data.models import Category
 from app.data.page_paths import PAGE_PATH
 from app.data.streamlit_state_keys import CATEGORY_SELECTED_CATEGORY, CATEGORIES_ALERT_MSG, CATEGORIES_ALERT_ICON
@@ -47,9 +48,7 @@ with st.container(
 st.space(size="small")
 
 if len(categories) == 0:
-    with st.container(vertical_alignment="center"):
-        st.space(size="large")
-        st.markdown(":gray[You have no categories, create some!]", text_alignment="center")
+    show_missing_and_stop("You have no categories, create some!")
 
 for category in categories:
     cat_con = st.container(border=True)

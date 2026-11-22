@@ -7,6 +7,7 @@ from app.components.alert import show_alert
 from app.components.home.actions_col import actions_col
 from app.components.home.date_cols import change_month_col
 from app.components.home.transaction import transaction_expandable
+from app.components.show_missing import show_missing_and_stop
 from app.data.models import TransactionView, BankAccount
 from app.data.streamlit_state_keys import HOME_ALERT_MSG, HOME_ALERT_ICON, HOME_SELECTED_MONTH
 from app.db.database import db
@@ -22,6 +23,13 @@ bank_accounts: list[BankAccount] = [
 ]
 
 selected_bank_account, selected_category = actions_col(bank_accounts)
+
+
+if len(bank_accounts) == 0:
+    show_missing_and_stop("You have no bank accounts, create some to add transactions!")
+
+if selected_bank_account is None:
+    show_missing_and_stop("Please select a bank account to view its transactions!")
 
 search = st.session_state.get("home_search", "").strip()
 
@@ -46,20 +54,8 @@ if budget > 0:
         st.warning("You have used 90% or more of your monthly limit!")
 
 
-if len(bank_accounts) == 0:
-    with st.container(vertical_alignment="center"):
-        st.space(size="large")
-        st.markdown(":gray[You have no bank accounts, create some to add transactions!]",
-                    text_alignment="center"
-                    )
-    st.stop()
-
 if db.Transactions.empty:
-    with st.container(vertical_alignment="center"):
-        st.space(size="large")
-        st.markdown(":gray[You have no transactions, create some!]",
-                    text_alignment="center")
-        st.stop()
+    show_missing_and_stop("You have no transactions, create some!")
 
 transactions: list[TransactionView] = (
     db.get_transactions_by_account_and_month(
@@ -75,11 +71,7 @@ if selected_category is not None:
     ]
 
     if len(transactions) <= 0:
-        with st.container(vertical_alignment="center"):
-            st.space(size="large")
-            st.markdown(":gray[You have no transactions, in this category, create some!]",
-                        text_alignment="center")
-            st.stop()
+        show_missing_and_stop("You have no transactions, in this category, create some!")
 
 if search:
     transactions = [
@@ -91,13 +83,10 @@ if search:
            )
     ]
 
+
 if not transactions:
-    with st.container(vertical_alignment="center"):
-        st.space(size="large")
-        st.markdown(f":gray[No transactions found for {selected_month:%B} of {selected_month.year}]",
-                    text_alignment="center"
-                    )
-    st.stop()
+    show_missing_and_stop("No transactions found for {selected_month:%B} of {selected_month.year}]")
+
 
 days = defaultdict(list)
 

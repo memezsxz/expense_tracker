@@ -2,6 +2,7 @@ import streamlit as st
 from iso4217 import Currency
 
 from app.components.alert import show_alert
+from app.components.show_missing import show_missing_and_stop
 from app.data.models import BankAccount
 from app.data.page_paths import PAGE_PATH
 from app.data.streamlit_state_keys import ACCOUNT_SELECTED_ACCOUNT, ACCOUNTS_ALERT_ICON, ACCOUNTS_ALERT_MSG
@@ -52,9 +53,8 @@ with st.container(
 st.space(size="small")
 
 if len(bank_accounts) == 0:
-    with st.container(vertical_alignment="center"):
-        st.space(size="large")
-        st.markdown(":gray[You have no accounts, create some!]", text_alignment="center")
+    show_missing_and_stop("You have no accounts, create some!]")
+
 
 for account in bank_accounts:
     acc_con = st.container(border=True)
