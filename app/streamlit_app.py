@@ -1,8 +1,15 @@
-import streamlit as st
+import sys
+from pathlib import Path
+
+
+# Add the project root to Python's import path
+ROOT_DIR = Path(__file__).resolve().parent.parent
+sys.path.insert(0, str(ROOT_DIR))
 
 # initiate db
 import app.db.database as db  # noqa: F401
 from app.data.page_paths import PAGE_PATH
+import streamlit as st
 
 pages = {
     "": [

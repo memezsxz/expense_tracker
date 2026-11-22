@@ -69,8 +69,6 @@ transactions: list[TransactionView] = (
     )
 )
 
-print(selected_category)
-
 if selected_category is not None:
     transactions = [
         t for t in transactions if t.transaction.category_id == selected_category.id
