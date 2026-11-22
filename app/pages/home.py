@@ -21,7 +21,7 @@ bank_accounts: list[BankAccount] = [
     for row in db.BankAccounts.to_dict(orient="records")
 ]
 
-selected_bank_account = actions_col(bank_accounts)
+selected_bank_account, selected_category = actions_col(bank_accounts)
 
 search = st.session_state.get("home_search", "").strip()
 
@@ -68,6 +68,20 @@ transactions: list[TransactionView] = (
         selected_month.month,
     )
 )
+
+print(selected_category)
+
+if selected_category is not None:
+    transactions = [
+        t for t in transactions if t.transaction.category_id == selected_category
+    ]
+
+    if transactions:
+        with st.container(vertical_alignment="center"):
+            st.space(size="large")
+            st.markdown(":gray[You have no transactions, in this category, create some!]",
+                        text_alignment="center")
+            st.stop()
 
 if search:
     transactions = [

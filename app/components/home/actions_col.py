@@ -86,7 +86,12 @@ def _open_create_transaction_dialog(
 
 
 def actions_col(bank_accounts: list[BankAccount]) -> BankAccount:
-    col1, col2, col3, col4, col5 = st.columns([4, 3, 0.7, 0.7, 0.7])
+    categories: list[Category] = [
+        Category.model_validate(row)
+        for row in db.Categories.to_dict(orient="records")
+    ]
+
+    col1, col2, col3, col4, col5, col6 = st.columns([2.5, 2.5, 2,  0.7, 0.7, 0.7])
 
     with col1:
         st.text_input(
@@ -106,18 +111,30 @@ def actions_col(bank_accounts: list[BankAccount]) -> BankAccount:
         )
 
     with col3:
+        selected_category = st.selectbox(
+            "Select category",
+            options=[None] + categories,
+            format_func=lambda cat: (
+                "No category" if cat is None
+                else f"{cat.name} ({str(cat.id)[:6]})"
+            ),
+            label_visibility="collapsed",
+            key="home_select_category",
+        )
+
+    with col4:
         if st.button("", icon=":material/trending_down:",
                      width="stretch", key="add_expense", help="Add Expense") and _check_can_add_transaction():
             _open_create_transaction_dialog(selected_bank_account, TransactionType.EXPENSE)
 
-    with col4:
+    with col5:
         if st.button("", icon=":material/trending_up:",
                      width="stretch", key="add_income", help="Add Income") and _check_can_add_transaction():
             _open_create_transaction_dialog(selected_bank_account, TransactionType.INCOME)
 
-    with col5:
+    with col6:
         if st.button("", icon=":material/swap_horiz:",
                      width="stretch", key="add_transfer", help="Add Transfer") and _check_can_add_transaction():
             _open_create_transaction_dialog(selected_bank_account, TransactionType.TRANSFER)
 
-    return selected_bank_account
+    return selected_bank_account, selected_category
