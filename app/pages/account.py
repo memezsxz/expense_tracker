@@ -79,7 +79,6 @@ df = db.Transactions[(db.Transactions["account_id"] == str(account.id)) & db.Tra
 # to_df = db.Transactions[(db.Transactions["to_account_id"] == str(account.id))]
 df["date"] = pd.to_datetime(df["date"])
 
-
 total_spend = df[(df["type"] == "expense")]["amount"].sum()
 total_income = df[(df["type"] == "income")]["amount"].sum()
 

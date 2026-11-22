@@ -1,5 +1,5 @@
 from typing import get_args
-from app.db.database import db
+
 import streamlit as st
 from iso4217 import Currency
 
@@ -7,6 +7,7 @@ from app.data.colors import BadgeColor, color_emojis
 from app.data.icons import icon_options
 from app.data.models import BankAccount
 from app.data.streamlit_state_keys import ACCOUNT_SELECTED_ACCOUNT
+from app.db.database import db
 
 
 def update_account(field: str, widget_key: str):
@@ -17,9 +18,7 @@ def update_account(field: str, widget_key: str):
     )
 
     st.session_state[ACCOUNT_SELECTED_ACCOUNT] = copy
-    db.save(copy , op="edit")
-    
-
+    db.save(copy, op="edit")
 
 
 def account_details_grid(account: BankAccount):

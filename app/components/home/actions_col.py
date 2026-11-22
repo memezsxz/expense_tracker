@@ -22,9 +22,10 @@ def _check_can_add_transaction():
 
     return True
 
+
 def _open_create_transaction_dialog(
-    selected_bank_account: BankAccount,
-    type: TransactionType
+        selected_bank_account: BankAccount,
+        type: TransactionType
 ):
     category_id = None
     to_account_id = None
@@ -40,7 +41,7 @@ def _open_create_transaction_dialog(
             (
                 a for a in accounts
                 if a.id != selected_bank_account.id
-                and a.currency == selected_bank_account.currency
+                   and a.currency == selected_bank_account.currency
             ),
             None
         )
@@ -91,7 +92,7 @@ def actions_col(bank_accounts: list[BankAccount]) -> BankAccount:
         for row in db.Categories.to_dict(orient="records")
     ]
 
-    col1, col2, col3, col4, col5, col6 = st.columns([2.5, 2.5, 2,  0.7, 0.7, 0.7])
+    col1, col2, col3, col4, col5, col6 = st.columns([2.5, 2.5, 2, 0.7, 0.7, 0.7])
 
     with col1:
         st.text_input(

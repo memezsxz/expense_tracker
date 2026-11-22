@@ -30,6 +30,7 @@ def update_transaction(field: str, widget_key: str):
 
     st.session_state[TRANSACTIONS_SELECTED_TRANSACTION] = copy
 
+
 def transactions_details_grid(
         transaction: Transaction,
 ):
