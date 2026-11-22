@@ -8,6 +8,12 @@ from app.db.database import db
 
 
 def _check_can_add_transaction():
+    """
+    Check if the user can add a transaction by checking if they have any categories and account.
+
+    Returns:
+        True or False
+    """
     if db.BankAccounts.empty:
         st.session_state[HOME_ALERT_MSG] = ":red[You have no accounts, create some!]"
         st.session_state[HOME_ALERT_ICON] = "🚨"
@@ -27,6 +33,13 @@ def _open_create_transaction_dialog(
         selected_bank_account: BankAccount,
         type: TransactionType
 ):
+    """
+    Creates a new transaction for the current bank account with the provided type and opens the create new transaction dialog.
+
+    Args:
+        selected_bank_account (BankAccount): The bank account whose transaction will be created.
+        type (TransactionType): The type of the transaction to be created.
+    """
     category_id = None
     to_account_id = None
     title = "Transfer"
@@ -80,13 +93,25 @@ def _open_create_transaction_dialog(
         width="medium",
         position="center",
     )
+
+    # into another function so that when rerun is called only the sub function is updated not this entire function
     def dialog():
         transactions_details_grid(transaction)
 
     dialog()
 
 
-def actions_col(bank_accounts: list[BankAccount]) -> BankAccount:
+def actions_col(bank_accounts: list[BankAccount]) -> (BankAccount, Category):
+    """
+    Renders the action row in the home screen.
+
+    Args:
+        bank_accounts (list[BankAccount]): The list of bank_accounts to be listed as options in the selected box.
+
+    Returns:
+        BankAccount: The bank account selected in the selected box.
+        Category: the current category selected in the selected box.
+    """
     categories: list[Category] = [
         Category.model_validate(row)
         for row in db.Categories.to_dict(orient="records")
