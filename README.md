@@ -1,6 +1,6 @@
 # 💰 Income Exchange
 
-**Income Exchange** is a simple, easy-to-use expense tracking application that helps you manage your finances, organize your transactions, and understand your spending habits.
+**[Income Exchange](https://income-exchange-memef-dev.streamlit.app/)** is a simple, easy-to-use expense tracking application that helps you manage your finances, organize your transactions, and understand your spending habits.
 
 ## ✨ Features
 
