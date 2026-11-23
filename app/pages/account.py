@@ -3,6 +3,7 @@ import plotly.express as px
 import streamlit as st
 
 from app.components.account_details_grid import account_details_grid
+from app.components.show_missing import show_missing_and_stop
 from app.components.stat_container import stat_container
 from app.data.models import BankAccount
 from app.data.page_paths import PAGE_PATH
@@ -71,13 +72,15 @@ account_details_grid(account)
 st.divider()
 
 st.markdown("### Stats:", anchors=False)
-# TODO: add stats
 
 col1, col2, col3 = st.columns(3)
 
 df = db.Transactions[(db.Transactions["account_id"] == str(account.id)) & db.Transactions["to_account_id"].isna()]
 # to_df = db.Transactions[(db.Transactions["to_account_id"] == str(account.id))]
 df["date"] = pd.to_datetime(df["date"])
+
+if df.empty:
+    show_missing_and_stop("Add transactions to view your account stats.")
 
 total_spend = df[(df["type"] == "expense")]["amount"].sum()
 total_income = df[(df["type"] == "income")]["amount"].sum()

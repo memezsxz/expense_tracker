@@ -3,6 +3,7 @@ import plotly.express as px
 import streamlit as st
 
 from app.components.category_details_grid import category_details_grid
+from app.components.show_missing import show_missing_and_stop
 from app.components.stat_container import stat_container
 from app.data.models import Category
 from app.data.page_paths import PAGE_PATH
@@ -71,11 +72,14 @@ category_details_grid(category)
 st.divider()
 
 st.markdown("### Stats:", anchors=False)
-# TODO: add stats
+
 
 col1, col2, col3, col4 = st.columns(4, )
 
 df = db.Transactions[db.Transactions["category_id"] == str(category.id)].reset_index()
+
+if df.empty:
+    show_missing_and_stop("Add transactions to view your account stats.")
 
 # total spending in category
 
