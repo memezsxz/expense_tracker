@@ -53,6 +53,8 @@ def transactions_details_grid(
             label="Title",
             label_visibility="collapsed",
             value=transaction.title,
+            required=True,
+            validate=(r"^.{3,}$", "Name must be at least 3 characters long."),
             key=key,
             on_change=update_transaction,
             args=("title", key),

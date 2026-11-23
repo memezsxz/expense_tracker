@@ -33,6 +33,8 @@ def account_details_grid(account: BankAccount):
             label="Name",
             label_visibility="collapsed",
             value=account.name,
+            required=True,
+            validate=(r"^.{3,}$", "Name must be at least 3 characters long."),
             key=key,
             on_change=update_account,
             args=("name", key),

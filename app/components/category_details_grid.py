@@ -31,6 +31,8 @@ def category_details_grid(category: Category):
             label="Name",
             label_visibility="collapsed",
             value=category.name,
+            required=True,
+            validate=(r"^.{3,}$", "Name must be at least 3 characters long."),
             key=key,
             on_change=update_category,
             args=("name", key),
