@@ -3,6 +3,7 @@ import plotly.express as px
 import streamlit as st
 
 from app.components.account_details_grid import account_details_grid
+from app.components.alert import show_alert
 from app.components.show_missing import show_missing_and_stop
 from app.components.stat_container import stat_container
 from app.data.models import BankAccount
@@ -39,6 +40,7 @@ def delete_account(to_delete_account: BankAccount):
     ).any():
         st.session_state[ACCOUNTS_ALERT_MSG] = ":red[Cannot delete an account that has transactions.]"
         st.session_state[ACCOUNTS_ALERT_ICON] = "🚨"
+        show_alert(ACCOUNTS_ALERT_MSG, ACCOUNTS_ALERT_ICON)
         return
 
     db.save(to_delete_account, "delete")

@@ -2,6 +2,7 @@ import pandas as pd
 import plotly.express as px
 import streamlit as st
 
+from app.components.alert import show_alert
 from app.components.category_details_grid import category_details_grid
 from app.components.show_missing import show_missing_and_stop
 from app.components.stat_container import stat_container
@@ -39,6 +40,7 @@ def delete_category(to_delete_category: Category):
     if (db.Transactions["category_id"] == category_id).any():
         st.session_state[CATEGORIES_ALERT_MSG] = ":red[Cannot delete a category that has transactions.]"
         st.session_state[CATEGORIES_ALERT_ICON] = "🚨"
+        show_alert(CATEGORIES_ALERT_MSG, CATEGORIES_ALERT_ICON)
         return
 
     db.save(to_delete_category, "delete")
