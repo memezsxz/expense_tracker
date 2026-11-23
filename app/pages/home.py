@@ -75,7 +75,7 @@ if search:
     ]
 
 if not transactions:
-    show_missing_and_stop("No transactions found for {selected_month:%B} of {selected_month.year}]")
+    show_missing_and_stop(f"No transactions found for {selected_month:%B} of {selected_month.year}]")
 
 days = defaultdict(list)
 
