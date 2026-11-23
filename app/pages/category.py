@@ -104,7 +104,9 @@ overall = (db.Transactions[(db.Transactions["type"] == "expense")]
            )
 
 overall["percentage"] = overall["amount"] / overall["amount"].sum() * 100
-overall_percentage = overall[overall["category_id"] == str(category.id)]["percentage"].values[0]
+values = overall[overall["category_id"] == str(category.id)]["percentage"].values
+
+overall_percentage = values[0] if len(values) != 0 else 0
 
 stat_container(col4, f"**Overall Spending**", f"{overall_percentage:.2f}%")
 
