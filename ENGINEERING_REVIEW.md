@@ -450,6 +450,7 @@ tests/                         # NEW: test_ledger.py (pure), test_pages.py (AppT
 ## K. Prioritized improvement roadmap
 
 **1. Fix immediately**
+
 | Item | Benefit | Effort | Risk | Verify |
 |---|---|---|---|---|
 | Derive balance; drop column (F02) | Correct balances forever | S | Low | invariant test; Emergency Savings shows 364.19 |
@@ -458,6 +459,7 @@ tests/                         # NEW: test_ledger.py (pure), test_pages.py (AppT
 | Decide public-demo data scope (F01) | Visitors can't wipe/see others' data | S (per-session seed) | Low | 2-session AppTest isolation |
 
 **2. High-value improvements**
+
 | Item | Benefit | Effort | Verify |
 |---|---|---|---|
 | AppTest + pytest suite (F10) | Stop "fixed…" commit cycles | M | CI green |
